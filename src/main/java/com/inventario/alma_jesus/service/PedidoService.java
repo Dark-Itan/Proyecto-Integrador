@@ -2,9 +2,13 @@ package com.inventario.alma_jesus.service;
 
 import com.inventario.alma_jesus.model.Pedido;
 import com.inventario.alma_jesus.model.PedidoProducto;
+import com.inventario.alma_jesus.model.Venta;
 import com.inventario.alma_jesus.repository.PedidoRepository;
+import com.inventario.alma_jesus.repository.VentaRepository;
 
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 public class PedidoService {
@@ -22,15 +26,12 @@ public class PedidoService {
         }
     }
 
-    //  NUEVO MÉTODO: Listar pedidos por fecha
     public List<Pedido> listarPedidosPorFecha(String fecha) {
         try {
-            // Validar que la fecha no esté vacía
             if (fecha == null || fecha.trim().isEmpty()) {
                 throw new RuntimeException("La fecha es requerida");
             }
 
-            // Validar formato básico de fecha (YYYY-MM-DD)
             if (!fecha.matches("\\d{4}-\\d{2}-\\d{2}")) {
                 throw new RuntimeException("Formato de fecha inválido. Use YYYY-MM-DD");
             }
@@ -65,13 +66,11 @@ public class PedidoService {
                 throw new RuntimeException("El total del pedido debe ser mayor a cero");
             }
 
-            // Calcular total cantidad
             int totalCantidad = pedido.getProductos().stream()
                     .mapToInt(PedidoProducto::getCantidad)
                     .sum();
             pedido.setTotalCantidad(totalCantidad);
 
-            // Generar resumen de producto
             String primerProducto = pedido.getProductos().get(0).getProductoNombre();
             if (pedido.getProductos().size() > 1) {
                 pedido.setResumenProducto(primerProducto.substring(0, Math.min(primerProducto.length(), 30)) +
@@ -80,12 +79,10 @@ public class PedidoService {
                 pedido.setResumenProducto(primerProducto);
             }
 
-            // Establecer etapa por defecto
             if (pedido.getEtapa() == null) {
                 pedido.setEtapa("Pendiente por realizar");
             }
 
-            // Establecer creador por defecto
             if (pedido.getCreadoPor() == null) {
                 pedido.setCreadoPor("admin");
             }
@@ -111,6 +108,11 @@ public class PedidoService {
                 throw new RuntimeException("No se pudo actualizar la etapa del pedido");
             }
 
+            // NUEVA FUNCIONALIDAD: Crear venta automáticamente cuando el pedido se finaliza
+            if ("Finalizado".equals(nuevaEtapa)) {
+                crearVentaDesdePedido(id);
+            }
+
             return obtenerPedido(id);
         } catch (SQLException e) {
             throw new RuntimeException("Error al actualizar etapa: " + e.getMessage(), e);
@@ -127,6 +129,79 @@ public class PedidoService {
             return repository.delete(id);
         } catch (SQLException e) {
             throw new RuntimeException("Error al eliminar pedido: " + e.getMessage(), e);
+        }
+    }
+
+    // NUEVO MÉTODO: Crear venta automáticamente desde pedido finalizado
+    private void crearVentaDesdePedido(Long pedidoId) {
+        try {
+            System.out.println("Creando venta desde pedido ID: " + pedidoId);
+
+            // Obtener el pedido completado
+            Pedido pedido = obtenerPedido(pedidoId);
+
+            // Verificar que el pedido tenga productos
+            if (pedido.getProductos() == null || pedido.getProductos().isEmpty()) {
+                System.out.println("❌ Pedido sin productos, no se crea venta");
+                return;
+            }
+
+            // Tomar el primer producto del pedido para la venta
+            PedidoProducto primerProducto = pedido.getProductos().get(0);
+
+            // Verificar datos esenciales
+            if (primerProducto.getProductoId() == null) {
+                System.out.println("❌ Producto sin ID, no se crea venta");
+                return;
+            }
+
+            // Formatear fecha actual
+            String fechaActual = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+
+            // Usar clienteId por defecto (1) ya que tu modelo no tiene clienteId
+            // En una implementación real, necesitarías agregar clienteId al modelo Pedido
+            int clienteIdDefault = 1; // Cliente genérico
+
+            // Crear la venta según tu modelo Venta actual
+            Venta venta = new Venta();
+            venta.setClienteId(clienteIdDefault); // Usar cliente por defecto
+            venta.setProductoId(primerProducto.getProductoId().intValue()); // Convertir Long a int
+            venta.setCantidad(primerProducto.getCantidad());
+
+            // Convertir BigDecimal a int para precio unitario
+            int precioUnitario = primerProducto.getPrecioUnitario() != null ?
+                    primerProducto.getPrecioUnitario().intValue() : 0;
+            venta.setPrecioUnitario(precioUnitario);
+
+            venta.setFecha(fechaActual);
+            venta.setTipo("pedido");
+            venta.setUsuarioRegistro("Sistema");
+
+            // El precioTotal se calcula automáticamente en el constructor de Venta
+
+            System.out.println(" Datos de venta a crear:");
+            System.out.println("  - Cliente ID: " + venta.getClienteId());
+            System.out.println("  - Producto ID: " + venta.getProductoId());
+            System.out.println("  - Cantidad: " + venta.getCantidad());
+            System.out.println("  - Precio Unitario: " + venta.getPrecioUnitario());
+            System.out.println("  - Precio Total: " + venta.getPrecioTotal());
+            System.out.println("  - Fecha: " + venta.getFecha());
+            System.out.println("  - Tipo: " + venta.getTipo());
+
+            // Guardar la venta usando el método que ya existe en VentaRepository
+            VentaRepository ventaRepository = new VentaRepository();
+            boolean ventaCreada = ventaRepository.crearVenta(venta);
+
+            if (ventaCreada) {
+                System.out.println("Venta creada exitosamente desde pedido ID: " + pedidoId);
+                System.out.println("Total de venta: $" + venta.getPrecioTotal());
+            } else {
+                System.out.println(" Error al crear venta desde pedido ID: " + pedidoId);
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error al crear venta desde pedido: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 }

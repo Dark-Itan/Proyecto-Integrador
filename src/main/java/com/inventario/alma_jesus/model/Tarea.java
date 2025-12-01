@@ -13,13 +13,13 @@ public class Tarea {
     private Boolean activo;
     private String creadoPor;
     private String fechaCreacion;
-    private Long trabajadorId; // NUEVO CAMPO
+    private String trabajadorId;
 
     public Tarea() {}
 
     public Tarea(Long id, String asunto, String detalles, LocalDate fechaAsignacion,
                  LocalDate fechaEntrega, Integer cantidadFiguras, String estado,
-                 Boolean activo, String creadoPor, String fechaCreacion, Long trabajadorId) {
+                 Boolean activo, String creadoPor, String fechaCreacion, String trabajadorId) {
         this.id = id;
         this.asunto = asunto;
         this.detalles = detalles;
@@ -33,7 +33,6 @@ public class Tarea {
         this.trabajadorId = trabajadorId;
     }
 
-    // Getters y Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -64,6 +63,6 @@ public class Tarea {
     public String getFechaCreacion() { return fechaCreacion; }
     public void setFechaCreacion(String fechaCreacion) { this.fechaCreacion = fechaCreacion; }
 
-    public Long getTrabajadorId() { return trabajadorId; }
-    public void setTrabajadorId(Long trabajadorId) { this.trabajadorId = trabajadorId; }
+    public String getTrabajadorId() { return trabajadorId; }
+    public void setTrabajadorId(String trabajadorId) { this.trabajadorId = trabajadorId; }
 }

@@ -36,20 +36,13 @@ public class ReparacionService {
         }
 
         if (reparacion.getEstado() == null) reparacion.setEstado("Pendiente");
-        if (reparacion.getPrioridadCliente() == null) reparacion.setPrioridadCliente("Media");
         if (reparacion.getCreadoPor() == null) reparacion.setCreadoPor("Sistema");
         if (reparacion.getAnticipo() == null) reparacion.setAnticipo(0);
-        if (reparacion.getCantidadPiezas() == null) reparacion.setCantidadPiezas(1);
         if (reparacion.getFechaIngreso() == null) reparacion.setFechaIngreso(java.time.LocalDate.now().toString());
-        if (reparacion.getReciboUrl() == null) reparacion.setReciboUrl(""); // INICIALIZAR reciboUrl
+        if (reparacion.getReciboUrl() == null) reparacion.setReciboUrl("");
+        if (reparacion.getMaterialOriginal() == null) reparacion.setMaterialOriginal("Yeso frio");
 
-        Reparacion reparacionCreada = reparacionRepository.save(reparacion);
-
-        if (reparacionCreada.getMaterialesUsados() != null && !reparacionCreada.getMaterialesUsados().trim().isEmpty()) {
-            procesarMaterialesParaInventario(reparacionCreada.getMaterialesUsados());
-        }
-
-        return reparacionCreada;
+        return reparacionRepository.save(reparacion);
     }
 
     public boolean actualizarReparacion(Reparacion reparacion) {
@@ -125,9 +118,8 @@ public class ReparacionService {
         recibo.put("saldoPendiente", calcularSaldoPendiente(reparacion));
         recibo.put("estado", reparacion.getEstado());
         recibo.put("fechaEntrega", reparacion.getFechaEntrega());
-        recibo.put("trabajadorAsignado", reparacion.getTrabajadorAsignado());
-        recibo.put("materialesUsados", reparacion.getMaterialesUsados());
-        recibo.put("reciboUrl", reparacion.getReciboUrl()); // NUEVO CAMPO EN RECIBO
+        recibo.put("materialesUsados", reparacion.getNotas());
+        recibo.put("reciboUrl", reparacion.getReciboUrl());
 
         System.out.println("Recibo generado para ID: " + reparacionId);
         return recibo;
@@ -139,11 +131,6 @@ public class ReparacionService {
                         estado.equals("En Proceso") ||
                         estado.equals("Completado") ||
                         estado.equals("Entregado"));
-    }
-
-    public void procesarMaterialesParaInventario(String materialesUsados) {
-        if (materialesUsados == null || materialesUsados.trim().isEmpty()) return;
-        System.out.println("Procesando materiales: " + materialesUsados);
     }
 
     public Integer calcularSaldoPendiente(Reparacion reparacion) {

@@ -82,11 +82,9 @@ public class ReparacionRepository {
         }
 
         String sql = "INSERT INTO reparacion (cliente_id, nombre_cliente, contacto, modelo, " +
-                "material_original, condicion, materiales_usados, " +
-                "costo_total, anticipo, cantidad_piezas, fecha_ingreso, fecha_entrega, " +
-                "estado, prioridad_cliente, notas, trabajador_asignado, " +
-                "imagen_url, recibo_url, creado_por) " + // AGREGADO recibo_url
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "material_original, condicion, costo_total, anticipo, fecha_ingreso, fecha_entrega, " +
+                "estado, notas, imagen_url, recibo_url, creado_por) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -97,19 +95,15 @@ public class ReparacionRepository {
             stmt.setString(4, reparacion.getModelo());
             stmt.setString(5, reparacion.getMaterialOriginal());
             stmt.setString(6, reparacion.getCondicion());
-            stmt.setString(7, reparacion.getMaterialesUsados());
-            stmt.setInt(8, reparacion.getCostoTotal() != null ? reparacion.getCostoTotal() : 0);
-            stmt.setInt(9, reparacion.getAnticipo() != null ? reparacion.getAnticipo() : 0);
-            stmt.setInt(10, reparacion.getCantidadPiezas() != null ? reparacion.getCantidadPiezas() : 1);
-            stmt.setString(11, reparacion.getFechaIngreso() != null ? reparacion.getFechaIngreso() : java.time.LocalDate.now().toString());
-            stmt.setString(12, reparacion.getFechaEntrega());
-            stmt.setString(13, reparacion.getEstado() != null ? reparacion.getEstado() : "Pendiente");
-            stmt.setString(14, reparacion.getPrioridadCliente() != null ? reparacion.getPrioridadCliente() : "Media");
-            stmt.setString(15, reparacion.getNotas());
-            stmt.setString(16, reparacion.getTrabajadorAsignado());
-            stmt.setString(17, reparacion.getImagenUrl());
-            stmt.setString(18, reparacion.getReciboUrl()); // NUEVO CAMPO
-            stmt.setString(19, reparacion.getCreadoPor() != null ? reparacion.getCreadoPor() : "Sistema");
+            stmt.setInt(7, reparacion.getCostoTotal() != null ? reparacion.getCostoTotal() : 0);
+            stmt.setInt(8, reparacion.getAnticipo() != null ? reparacion.getAnticipo() : 0);
+            stmt.setString(9, reparacion.getFechaIngreso() != null ? reparacion.getFechaIngreso() : java.time.LocalDate.now().toString());
+            stmt.setString(10, reparacion.getFechaEntrega());
+            stmt.setString(11, reparacion.getEstado() != null ? reparacion.getEstado() : "Pendiente");
+            stmt.setString(12, reparacion.getNotas());
+            stmt.setString(13, reparacion.getImagenUrl());
+            stmt.setString(14, reparacion.getReciboUrl());
+            stmt.setString(15, reparacion.getCreadoPor() != null ? reparacion.getCreadoPor() : "Sistema");
 
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
@@ -136,10 +130,9 @@ public class ReparacionRepository {
         }
 
         String sql = "UPDATE reparacion SET nombre_cliente = ?, contacto = ?, modelo = ?, " +
-                "material_original = ?, condicion = ?, materiales_usados = ?, " +
-                "costo_total = ?, anticipo = ?, cantidad_piezas = ?, fecha_entrega = ?, " +
-                "estado = ?, prioridad_cliente = ?, notas = ?, trabajador_asignado = ?, " +
-                "imagen_url = ?, recibo_url = ? WHERE id = ? AND activo = true"; // AGREGADO recibo_url
+                "material_original = ?, condicion = ?, costo_total = ?, anticipo = ?, " +
+                "fecha_entrega = ?, estado = ?, notas = ?, imagen_url = ?, recibo_url = ? " +
+                "WHERE id = ? AND activo = true";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -149,18 +142,14 @@ public class ReparacionRepository {
             stmt.setString(3, reparacion.getModelo());
             stmt.setString(4, reparacion.getMaterialOriginal());
             stmt.setString(5, reparacion.getCondicion());
-            stmt.setString(6, reparacion.getMaterialesUsados());
-            stmt.setInt(7, reparacion.getCostoTotal());
-            stmt.setInt(8, reparacion.getAnticipo());
-            stmt.setInt(9, reparacion.getCantidadPiezas());
-            stmt.setString(10, reparacion.getFechaEntrega());
-            stmt.setString(11, reparacion.getEstado());
-            stmt.setString(12, reparacion.getPrioridadCliente());
-            stmt.setString(13, reparacion.getNotas());
-            stmt.setString(14, reparacion.getTrabajadorAsignado());
-            stmt.setString(15, reparacion.getImagenUrl());
-            stmt.setString(16, reparacion.getReciboUrl()); // NUEVO CAMPO
-            stmt.setLong(17, reparacion.getId());
+            stmt.setInt(6, reparacion.getCostoTotal());
+            stmt.setInt(7, reparacion.getAnticipo());
+            stmt.setString(8, reparacion.getFechaEntrega());
+            stmt.setString(9, reparacion.getEstado());
+            stmt.setString(10, reparacion.getNotas());
+            stmt.setString(11, reparacion.getImagenUrl());
+            stmt.setString(12, reparacion.getReciboUrl());
+            stmt.setLong(13, reparacion.getId());
 
             return stmt.executeUpdate() > 0;
 
@@ -217,18 +206,14 @@ public class ReparacionRepository {
         reparacion.setModelo(rs.getString("modelo"));
         reparacion.setMaterialOriginal(rs.getString("material_original"));
         reparacion.setCondicion(rs.getString("condicion"));
-        reparacion.setMaterialesUsados(rs.getString("materiales_usados"));
         reparacion.setCostoTotal(rs.getInt("costo_total"));
         reparacion.setAnticipo(rs.getInt("anticipo"));
-        reparacion.setCantidadPiezas(rs.getInt("cantidad_piezas"));
         reparacion.setFechaIngreso(rs.getString("fecha_ingreso"));
         reparacion.setFechaEntrega(rs.getString("fecha_entrega"));
         reparacion.setEstado(rs.getString("estado"));
-        reparacion.setPrioridadCliente(rs.getString("prioridad_cliente"));
         reparacion.setNotas(rs.getString("notas"));
-        reparacion.setTrabajadorAsignado(rs.getString("trabajador_asignado"));
         reparacion.setImagenUrl(rs.getString("imagen_url"));
-        reparacion.setReciboUrl(rs.getString("recibo_url")); // NUEVO CAMPO
+        reparacion.setReciboUrl(rs.getString("recibo_url"));
         reparacion.setCreadoPor(rs.getString("creado_por"));
         reparacion.setActivo(rs.getBoolean("activo"));
         reparacion.setFechaRegistro(rs.getString("fecha_registro"));

@@ -13,7 +13,7 @@ public class ReparacionRouter {
     public void configureRoutes(Javalin app) {
         System.out.println("🛣️ [REPARACION-ROUTER] Configurando 8 endpoints de reparaciones");
 
-        // ✅ TODOS LOS ENDPOINTS QUE PIDES:
+        // TODOS LOS ENDPOINTS QUE PIDES:
         app.get("/api/v1/reparaciones", reparacionController::listarReparaciones);
         app.get("/api/v1/reparaciones/{id}", reparacionController::obtenerReparacion);
         app.post("/api/v1/reparaciones", reparacionController::crearReparacion);

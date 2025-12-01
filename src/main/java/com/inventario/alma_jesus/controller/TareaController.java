@@ -7,11 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@SuppressWarnings("unchecked")
 public class TareaController {
     private final TareaService tareaService = new TareaService();
 
-    // Endpoint 50: GET /api/v1/tareas - Listar tareas (admin)
     public void listarTareas(Context ctx) {
         try {
             String buscar = ctx.queryParam("buscar");
@@ -33,10 +31,9 @@ public class TareaController {
         }
     }
 
-    // NUEVO: GET /api/v1/tareas/trabajador/{trabajadorId} - Listar tareas por trabajador
     public void listarTareasPorTrabajador(Context ctx) {
         try {
-            Long trabajadorId = Long.parseLong(ctx.pathParam("trabajadorId"));
+            String trabajadorId = ctx.pathParam("trabajadorId");
             String estado = ctx.queryParam("estado");
 
             List<Tarea> tareas = tareaService.listarTareasPorTrabajador(trabajadorId, estado);
@@ -55,7 +52,6 @@ public class TareaController {
         }
     }
 
-    // Endpoint 51: GET /api/v1/tareas/{id} - Obtener tarea
     public void obtenerTarea(Context ctx) {
         try {
             Long id = Long.parseLong(ctx.pathParam("id"));
@@ -73,7 +69,6 @@ public class TareaController {
         }
     }
 
-    // Endpoint 52: POST /api/v1/tareas - Crear tarea
     public void crearTarea(Context ctx) {
         try {
             Tarea tarea = ctx.bodyAsClass(Tarea.class);
@@ -92,7 +87,6 @@ public class TareaController {
         }
     }
 
-    // Endpoint 53: PUT /api/v1/tareas/{id}/estado - Actualizar estado
     public void actualizarEstado(Context ctx) {
         try {
             Long id = Long.parseLong(ctx.pathParam("id"));
@@ -121,7 +115,6 @@ public class TareaController {
         }
     }
 
-    // Endpoint 54: DELETE /api/v1/tareas/{id} - Eliminar tarea
     public void eliminarTarea(Context ctx) {
         try {
             Long id = Long.parseLong(ctx.pathParam("id"));
@@ -144,7 +137,6 @@ public class TareaController {
         }
     }
 
-    // Método adicional: PUT /api/v1/tareas/{id} - Actualizar tarea completa
     public void actualizarTarea(Context ctx) {
         try {
             Long id = Long.parseLong(ctx.pathParam("id"));

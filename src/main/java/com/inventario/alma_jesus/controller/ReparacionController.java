@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.javalin.http.Context;
 import java.util.*;
 
-@SuppressWarnings("unchecked")
 public class ReparacionController {
     private final ReparacionService reparacionService;
     private final ObjectMapper objectMapper;
@@ -18,7 +17,7 @@ public class ReparacionController {
 
     public void listarReparaciones(Context ctx) {
         try {
-            System.out.println("🎯 [REPARACION-CONTROLLER] Listando reparaciones");
+            System.out.println("Listando reparaciones");
 
             String estado = ctx.queryParam("estado");
             String cliente = ctx.queryParam("cliente");
@@ -32,10 +31,11 @@ public class ReparacionController {
             response.put("total", reparaciones.size());
 
             ctx.json(response).status(200);
-            System.out.println("✅ [REPARACION-CONTROLLER] Listado exitoso: " + reparaciones.size() + " reparaciones");
+            System.out.println("Listado exitoso: " + reparaciones.size() + " reparaciones");
 
         } catch (Exception e) {
-            System.err.println("❌ [REPARACION-CONTROLLER] Error al listar: " + e.getMessage());
+            System.err.println("Error al listar: " + e.getMessage());
+            e.printStackTrace();
 
             Map<String, Object> error = new HashMap<>();
             error.put("success", false);
@@ -48,7 +48,7 @@ public class ReparacionController {
     public void obtenerReparacion(Context ctx) {
         try {
             Long id = Long.parseLong(ctx.pathParam("id"));
-            System.out.println("🎯 [REPARACION-CONTROLLER] Obteniendo reparación ID: " + id);
+            System.out.println("Obteniendo reparacion ID: " + id);
 
             Optional<Reparacion> reparacionOpt = reparacionService.obtenerReparacion(id);
 
@@ -60,30 +60,30 @@ public class ReparacionController {
                 response.put("saldoPendiente", reparacionService.calcularSaldoPendiente(reparacion));
 
                 ctx.json(response).status(200);
-                System.out.println("✅ [REPARACION-CONTROLLER] Reparación encontrada ID: " + id);
+                System.out.println("Reparacion encontrada ID: " + id);
             } else {
                 Map<String, Object> error = new HashMap<>();
                 error.put("success", false);
-                error.put("message", "Reparación no encontrada");
+                error.put("message", "Reparacion no encontrada");
 
                 ctx.json(error).status(404);
-                System.out.println("⚠️ [REPARACION-CONTROLLER] Reparación no encontrada ID: " + id);
+                System.out.println("Reparacion no encontrada ID: " + id);
             }
 
         } catch (NumberFormatException e) {
-            System.err.println("❌ [REPARACION-CONTROLLER] ID inválido");
+            System.err.println("ID invalido");
 
             Map<String, Object> error = new HashMap<>();
             error.put("success", false);
-            error.put("message", "ID de reparación inválido");
+            error.put("message", "ID de reparacion invalido");
 
             ctx.json(error).status(400);
         } catch (Exception e) {
-            System.err.println("❌ [REPARACION-CONTROLLER] Error al obtener: " + e.getMessage());
+            System.err.println("Error al obtener: " + e.getMessage());
 
             Map<String, Object> error = new HashMap<>();
             error.put("success", false);
-            error.put("message", "Error al obtener reparación: " + e.getMessage());
+            error.put("message", "Error al obtener reparacion: " + e.getMessage());
 
             ctx.json(error).status(500);
         }
@@ -91,7 +91,7 @@ public class ReparacionController {
 
     public void crearReparacion(Context ctx) {
         try {
-            System.out.println("🎯 [REPARACION-CONTROLLER] Creando nueva reparación");
+            System.out.println("Creando nueva reparacion");
 
             Reparacion reparacion = objectMapper.readValue(ctx.body(), Reparacion.class);
 
@@ -103,15 +103,15 @@ public class ReparacionController {
 
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
-            response.put("message", "Reparación creada exitosamente");
+            response.put("message", "Reparacion creada exitosamente");
             response.put("data", reparacionCreada);
             response.put("saldoPendiente", reparacionService.calcularSaldoPendiente(reparacionCreada));
 
             ctx.json(response).status(201);
-            System.out.println("✅ [REPARACION-CONTROLLER] Reparación creada ID: " + reparacionCreada.getId());
+            System.out.println("Reparacion creada ID: " + reparacionCreada.getId());
 
         } catch (IllegalArgumentException e) {
-            System.err.println("❌ [REPARACION-CONTROLLER] Error de validación: " + e.getMessage());
+            System.err.println("Error de validacion: " + e.getMessage());
 
             Map<String, Object> error = new HashMap<>();
             error.put("success", false);
@@ -119,21 +119,20 @@ public class ReparacionController {
 
             ctx.json(error).status(400);
         } catch (Exception e) {
-            System.err.println("❌ [REPARACION-CONTROLLER] Error al crear: " + e.getMessage());
+            System.err.println("Error al crear: " + e.getMessage());
 
             Map<String, Object> error = new HashMap<>();
             error.put("success", false);
-            error.put("message", "Error al crear reparación: " + e.getMessage());
+            error.put("message", "Error al crear reparacion: " + e.getMessage());
 
             ctx.json(error).status(500);
         }
     }
 
-    // NUEVO MÉTODO: ACTUALIZAR REPARACIÓN COMPLETA
     public void actualizarReparacion(Context ctx) {
         try {
             Long id = Long.parseLong(ctx.pathParam("id"));
-            System.out.println("🎯 [REPARACION-CONTROLLER] Actualizando reparación ID: " + id);
+            System.out.println("Actualizando reparacion ID: " + id);
 
             Reparacion reparacion = objectMapper.readValue(ctx.body(), Reparacion.class);
             reparacion.setId(id);
@@ -145,22 +144,22 @@ public class ReparacionController {
 
                 Map<String, Object> response = new HashMap<>();
                 response.put("success", true);
-                response.put("message", "Reparación actualizada exitosamente");
+                response.put("message", "Reparacion actualizada exitosamente");
                 response.put("data", reparacionActualizada.orElse(null));
 
                 ctx.json(response).status(200);
-                System.out.println("✅ [REPARACION-CONTROLLER] Reparación actualizada ID: " + id);
+                System.out.println("Reparacion actualizada ID: " + id);
             } else {
                 Map<String, Object> error = new HashMap<>();
                 error.put("success", false);
-                error.put("message", "Reparación no encontrada o no se pudo actualizar");
+                error.put("message", "Reparacion no encontrada o no se pudo actualizar");
 
                 ctx.json(error).status(404);
-                System.out.println("⚠️ [REPARACION-CONTROLLER] No se pudo actualizar ID: " + id);
+                System.out.println("No se pudo actualizar ID: " + id);
             }
 
         } catch (IllegalArgumentException e) {
-            System.err.println("❌ [REPARACION-CONTROLLER] Error de validación: " + e.getMessage());
+            System.err.println("Error de validacion: " + e.getMessage());
 
             Map<String, Object> error = new HashMap<>();
             error.put("success", false);
@@ -168,11 +167,11 @@ public class ReparacionController {
 
             ctx.json(error).status(400);
         } catch (Exception e) {
-            System.err.println("❌ [REPARACION-CONTROLLER] Error al actualizar: " + e.getMessage());
+            System.err.println("Error al actualizar: " + e.getMessage());
 
             Map<String, Object> error = new HashMap<>();
             error.put("success", false);
-            error.put("message", "Error al actualizar reparación: " + e.getMessage());
+            error.put("message", "Error al actualizar reparacion: " + e.getMessage());
 
             ctx.json(error).status(500);
         }
@@ -181,7 +180,7 @@ public class ReparacionController {
     public void cambiarEstado(Context ctx) {
         try {
             Long id = Long.parseLong(ctx.pathParam("id"));
-            System.out.println("🎯 [REPARACION-CONTROLLER] Cambiando estado reparación ID: " + id);
+            System.out.println("Cambiando estado reparacion ID: " + id);
 
             Map<String, String> requestBody = objectMapper.readValue(ctx.body(), Map.class);
             String nuevoEstado = requestBody.get("estado");
@@ -199,18 +198,18 @@ public class ReparacionController {
                 response.put("nuevoEstado", nuevoEstado);
 
                 ctx.json(response).status(200);
-                System.out.println("✅ [REPARACION-CONTROLLER] Estado actualizado ID: " + id + " -> " + nuevoEstado);
+                System.out.println("Estado actualizado ID: " + id + " -> " + nuevoEstado);
             } else {
                 Map<String, Object> error = new HashMap<>();
                 error.put("success", false);
-                error.put("message", "Reparación no encontrada o no se pudo actualizar el estado");
+                error.put("message", "Reparacion no encontrada o no se pudo actualizar el estado");
 
                 ctx.json(error).status(404);
-                System.out.println("⚠️ [REPARACION-CONTROLLER] No se pudo cambiar estado ID: " + id);
+                System.out.println("No se pudo cambiar estado ID: " + id);
             }
 
         } catch (IllegalArgumentException e) {
-            System.err.println("❌ [REPARACION-CONTROLLER] Error de validación: " + e.getMessage());
+            System.err.println("Error de validacion: " + e.getMessage());
 
             Map<String, Object> error = new HashMap<>();
             error.put("success", false);
@@ -218,7 +217,7 @@ public class ReparacionController {
 
             ctx.json(error).status(400);
         } catch (Exception e) {
-            System.err.println("❌ [REPARACION-CONTROLLER] Error al cambiar estado: " + e.getMessage());
+            System.err.println("Error al cambiar estado: " + e.getMessage());
 
             Map<String, Object> error = new HashMap<>();
             error.put("success", false);
@@ -231,7 +230,7 @@ public class ReparacionController {
     public void obtenerHistorial(Context ctx) {
         try {
             Long id = Long.parseLong(ctx.pathParam("id"));
-            System.out.println("🎯 [REPARACION-CONTROLLER] Obteniendo historial ID: " + id);
+            System.out.println("Obteniendo historial ID: " + id);
 
             List<Map<String, Object>> historial = reparacionService.obtenerHistorial(id);
 
@@ -241,18 +240,18 @@ public class ReparacionController {
             response.put("total", historial.size());
 
             ctx.json(response).status(200);
-            System.out.println("✅ [REPARACION-CONTROLLER] Historial obtenido ID: " + id + " - " + historial.size() + " entradas");
+            System.out.println("Historial obtenido ID: " + id + " - " + historial.size() + " entradas");
 
         } catch (NumberFormatException e) {
-            System.err.println("❌ [REPARACION-CONTROLLER] ID inválido para historial");
+            System.err.println("ID invalido para historial");
 
             Map<String, Object> error = new HashMap<>();
             error.put("success", false);
-            error.put("message", "ID de reparación inválido");
+            error.put("message", "ID de reparacion invalido");
 
             ctx.json(error).status(400);
         } catch (Exception e) {
-            System.err.println("❌ [REPARACION-CONTROLLER] Error al obtener historial: " + e.getMessage());
+            System.err.println("Error al obtener historial: " + e.getMessage());
 
             Map<String, Object> error = new HashMap<>();
             error.put("success", false);
@@ -265,7 +264,7 @@ public class ReparacionController {
     public void generarRecibo(Context ctx) {
         try {
             Long id = Long.parseLong(ctx.pathParam("id"));
-            System.out.println("🎯 [REPARACION-CONTROLLER] Generando recibo ID: " + id);
+            System.out.println("Generando recibo ID: " + id);
 
             Map<String, Object> recibo = reparacionService.generarRecibo(id);
 
@@ -275,18 +274,18 @@ public class ReparacionController {
             response.put("data", recibo);
 
             ctx.json(response).status(200);
-            System.out.println("✅ [REPARACION-CONTROLLER] Recibo generado ID: " + id);
+            System.out.println("Recibo generado ID: " + id);
 
         } catch (NumberFormatException e) {
-            System.err.println("❌ [REPARACION-CONTROLLER] ID inválido para recibo");
+            System.err.println("ID invalido para recibo");
 
             Map<String, Object> error = new HashMap<>();
             error.put("success", false);
-            error.put("message", "ID de reparación inválido");
+            error.put("message", "ID de reparacion invalido");
 
             ctx.json(error).status(400);
         } catch (Exception e) {
-            System.err.println("❌ [REPARACION-CONTROLLER] Error al generar recibo: " + e.getMessage());
+            System.err.println("Error al generar recibo: " + e.getMessage());
 
             Map<String, Object> error = new HashMap<>();
             error.put("success", false);
@@ -299,40 +298,40 @@ public class ReparacionController {
     public void eliminarReparacion(Context ctx) {
         try {
             Long id = Long.parseLong(ctx.pathParam("id"));
-            System.out.println("🎯 [REPARACION-CONTROLLER] Eliminando reparación ID: " + id);
+            System.out.println("Eliminando reparacion ID: " + id);
 
             boolean eliminado = reparacionService.eliminarReparacion(id);
 
             if (eliminado) {
                 Map<String, Object> response = new HashMap<>();
                 response.put("success", true);
-                response.put("message", "Reparación eliminada exitosamente");
+                response.put("message", "Reparacion eliminada exitosamente");
 
                 ctx.json(response).status(200);
-                System.out.println("✅ [REPARACION-CONTROLLER] Reparación eliminada ID: " + id);
+                System.out.println("Reparacion eliminada ID: " + id);
             } else {
                 Map<String, Object> error = new HashMap<>();
                 error.put("success", false);
-                error.put("message", "Reparación no encontrada o no se pudo eliminar");
+                error.put("message", "Reparacion no encontrada o no se pudo eliminar");
 
                 ctx.json(error).status(404);
-                System.out.println("⚠️ [REPARACION-CONTROLLER] Reparación no encontrada para eliminar ID: " + id);
+                System.out.println("Reparacion no encontrada para eliminar ID: " + id);
             }
 
         } catch (NumberFormatException e) {
-            System.err.println("❌ [REPARACION-CONTROLLER] ID inválido");
+            System.err.println("ID invalido");
 
             Map<String, Object> error = new HashMap<>();
             error.put("success", false);
-            error.put("message", "ID de reparación inválido");
+            error.put("message", "ID de reparacion invalido");
 
             ctx.json(error).status(400);
         } catch (Exception e) {
-            System.err.println("❌ [REPARACION-CONTROLLER] Error al eliminar: " + e.getMessage());
+            System.err.println("Error al eliminar: " + e.getMessage());
 
             Map<String, Object> error = new HashMap<>();
             error.put("success", false);
-            error.put("message", "Error al eliminar reparación: " + e.getMessage());
+            error.put("message", "Error al eliminar reparacion: " + e.getMessage());
 
             ctx.json(error).status(500);
         }
