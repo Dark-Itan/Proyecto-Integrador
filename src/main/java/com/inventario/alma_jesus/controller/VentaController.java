@@ -11,10 +11,31 @@ import java.util.HashMap;
 
 import com.inventario.alma_jesus.repository.DatabaseConnection;
 
+/**
+ * Controlador para gestionar las operaciones relacionadas con ventas.
+ * <p>
+ * Esta clase maneja el registro, consulta y administración de ventas,
+ * incluyendo la búsqueda de productos en pedidos existentes.
+ * </p>
+ *
+ * @version 1.0
+ * @since 2024
+ * @see VentaService
+ */
 public class VentaController {
     private VentaService ventaService = new VentaService();
     private ObjectMapper objectMapper = new ObjectMapper();
 
+    /**
+     * Endpoint: Lista todas las ventas registradas en el sistema.
+     * <p>
+     * Retorna una lista completa de ventas con sus detalles incluyendo
+     * productos, cantidades, precios y fechas de registro.
+     * </p>
+     *
+     * @param ctx Contexto de Javalin con la petición HTTP
+     * @example GET /api/v1/ventas
+     */
     public void listarVentas(Context ctx) {
         try {
             Map<String, Object> result = ventaService.listarVentas();
@@ -33,6 +54,16 @@ public class VentaController {
         }
     }
 
+    /**
+     * Endpoint: Obtiene una venta específica por su ID.
+     * <p>
+     * Busca y retorna todos los detalles de una venta incluyendo
+     * información del cliente, productos vendidos y totales.
+     * </p>
+     *
+     * @param ctx Contexto de Javalin con la petición HTTP
+     * @example GET /api/v1/ventas/123
+     */
     public void obtenerVentaPorId(Context ctx) {
         try {
             String idParam = ctx.pathParam("id");
@@ -67,6 +98,31 @@ public class VentaController {
         }
     }
 
+    /**
+     * Endpoint: Registra una nueva venta en el sistema.
+     * <p>
+     * Procesa una venta completa incluyendo productos, cantidades,
+     * descuentos y actualiza el inventario automáticamente.
+     * </p>
+     *
+     * @param ctx Contexto de Javalin con la petición HTTP
+     * @example
+     * POST /api/v1/ventas
+     * Body:
+     * {
+     *     "cliente_id": "CLI001",
+     *     "vendedor_id": "VEN001",
+     *     "productos": [
+     *         {
+     *             "producto_id": 1,
+     *             "cantidad": 2,
+     *             "precio_unitario": 150.50
+     *         }
+     *     ],
+     *     "descuento": 0.0,
+     *     "metodo_pago": "EFECTIVO"
+     * }
+     */
     public void registrarVenta(Context ctx) {
         try {
             String body = ctx.body();
@@ -112,6 +168,17 @@ public class VentaController {
         }
     }
 
+    /**
+     * Endpoint: Elimina una venta del sistema.
+     * <p>
+     * Realiza una eliminación completa de la venta, incluyendo
+     * la reversión de inventario si corresponde.
+     * Solo disponible para ventas recientes sin facturación electrónica.
+     * </p>
+     *
+     * @param ctx Contexto de Javalin con la petición HTTP
+     * @example DELETE /api/v1/ventas/123
+     */
     public void eliminarVenta(Context ctx) {
         try {
             String idParam = ctx.pathParam("id");
@@ -154,7 +221,17 @@ public class VentaController {
         }
     }
 
-    // NUEVO MÉTODO: Buscar producto en pedidos por nombre
+    /**
+     * Endpoint: Busca un producto en pedidos por nombre.
+     * <p>
+     * Realiza una búsqueda en los pedidos existentes para encontrar
+     * productos por nombre o parte del nombre. Útil para autocompletar
+     * en interfaces de usuario.
+     * </p>
+     *
+     * @param ctx Contexto de Javalin con la petición HTTP
+     * @example GET /api/v1/ventas/buscar-producto?nombre=mesa
+     */
     public void buscarProductoEnPedidos(Context ctx) {
         try {
             String nombreProducto = ctx.queryParam("nombre");

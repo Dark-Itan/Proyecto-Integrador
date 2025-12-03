@@ -5,12 +5,32 @@ import io.javalin.http.Context;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
 
+/**
+ * Controlador para gestionar las operaciones relacionadas con usuarios.
+ * <p>
+ * Esta clase maneja el CRUD completo de usuarios, incluyendo autenticación,
+ * gestión de contraseñas y administración de perfiles de usuario.
+ * </p>
+ *
+ * @version 1.0
+ * @since 2024
+ * @see UsuarioService
+ */
 @SuppressWarnings("unchecked")
-
 public class UsuarioController {
     private UsuarioService usuarioService = new UsuarioService();
     private ObjectMapper objectMapper = new ObjectMapper();
 
+    /**
+     * Endpoint: Lista todos los usuarios registrados en el sistema.
+     * <p>
+     * Retorna una lista completa de usuarios con sus datos básicos.
+     * No incluye información sensible como contraseñas.
+     * </p>
+     *
+     * @param ctx Contexto de Javalin con la petición HTTP
+     * @example GET /api/v1/usuarios
+     */
     public void listarUsuarios(Context ctx) {
         try {
             Map<String, Object> result = usuarioService.listarUsuarios();
@@ -30,6 +50,16 @@ public class UsuarioController {
         }
     }
 
+    /**
+     * Endpoint: Obtiene un usuario específico por su ID.
+     * <p>
+     * Busca y retorna la información completa de un usuario
+     * identificado por su ID único.
+     * </p>
+     *
+     * @param ctx Contexto de Javalin con la petición HTTP
+     * @example GET /api/v1/usuarios/USU001
+     */
     public void obtenerUsuarioPorId(Context ctx) {
         try {
             String id = ctx.pathParam("id");
@@ -59,6 +89,26 @@ public class UsuarioController {
         }
     }
 
+    /**
+     * Endpoint: Crea un nuevo usuario en el sistema.
+     * <p>
+     * Registra un nuevo usuario con todos sus datos básicos.
+     * La contraseña se encripta automáticamente antes de almacenarse.
+     * </p>
+     *
+     * @param ctx Contexto de Javalin con la petición HTTP
+     * @example
+     * POST /api/v1/usuarios
+     * Body:
+     * {
+     *     "id": "USU001",
+     *     "nombre": "Juan Pérez",
+     *     "email": "juan@ejemplo.com",
+     *     "password": "ContraseñaSegura123",
+     *     "rol": "TRABAJADOR",
+     *     "activo": true
+     * }
+     */
     public void crearUsuario(Context ctx) {
         try {
             String body = ctx.body();
@@ -101,6 +151,18 @@ public class UsuarioController {
         }
     }
 
+    /**
+     * Endpoint: Cambia la contraseña de un usuario existente.
+     * <p>
+     * Permite a los usuarios actualizar su contraseña.
+     * La nueva contraseña se encripta antes de almacenarse.
+     * </p>
+     *
+     * @param ctx Contexto de Javalin con la petición HTTP
+     * @example
+     * PATCH /api/v1/usuarios/USU001/password
+     * Body: { "nuevaPassword": "NuevaContraseña456" }
+     */
     public void cambiarPassword(Context ctx) {
         try {
             String id = ctx.pathParam("id");
@@ -153,7 +215,16 @@ public class UsuarioController {
         }
     }
 
-    //NUEVO MÉTODO AGREGADO: Eliminar usuario
+    /**
+     * Endpoint: Elimina un usuario del sistema.
+     * <p>
+     * Realiza una eliminación lógica del usuario, marcándolo como inactivo
+     * o eliminando permanentemente según la configuración del sistema.
+     * </p>
+     *
+     * @param ctx Contexto de Javalin con la petición HTTP
+     * @example DELETE /api/v1/usuarios/USU001
+     */
     public void eliminarUsuario(Context ctx) {
         try {
             String id = ctx.pathParam("id");

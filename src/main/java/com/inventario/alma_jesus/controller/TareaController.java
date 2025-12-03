@@ -7,9 +7,35 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Controlador para gestionar las operaciones relacionadas con tareas de producción.
+ * <p>
+ * Esta clase maneja la asignación, seguimiento y gestión de tareas para los trabajadores
+ * del taller, permitiendo organizar el flujo de trabajo y priorizar actividades.
+ * </p>
+ *
+ * @version 1.0
+ * @since 2024
+ * @see TareaService
+ * @see Tarea
+ */
 public class TareaController {
+
+    /**
+     * Servicio que contiene la lógica de negocio para la gestión de tareas.
+     */
     private final TareaService tareaService = new TareaService();
 
+    /**
+     * Endpoint: Lista todas las tareas con opciones de filtrado.
+     * <p>
+     * Permite listar tareas con filtros por texto de búsqueda y estado.
+     * Retorna tareas ordenadas por prioridad y fecha de creación.
+     * </p>
+     *
+     * @param ctx Contexto de Javalin con la petición HTTP
+     * @example GET /api/v1/tareas?estado=PENDIENTE&buscar=ensamblaje
+     */
     public void listarTareas(Context ctx) {
         try {
             String buscar = ctx.queryParam("buscar");
@@ -31,6 +57,16 @@ public class TareaController {
         }
     }
 
+    /**
+     * Endpoint: Lista tareas asignadas a un trabajador específico.
+     * <p>
+     * Retorna todas las tareas asignadas a un trabajador, útil para
+     * dashboards individuales y gestión personal del trabajo.
+     * </p>
+     *
+     * @param ctx Contexto de Javalin con la petición HTTP
+     * @example GET /api/v1/tareas/trabajador/TRAB001?estado=EN_PROGRESO
+     */
     public void listarTareasPorTrabajador(Context ctx) {
         try {
             String trabajadorId = ctx.pathParam("trabajadorId");
@@ -52,6 +88,16 @@ public class TareaController {
         }
     }
 
+    /**
+     * Endpoint: Obtiene una tarea específica por ID.
+     * <p>
+     * Retorna todos los detalles de una tarea incluyendo asignación,
+     * descripción, fechas límite y progreso actual.
+     * </p>
+     *
+     * @param ctx Contexto de Javalin con la petición HTTP
+     * @example GET /api/v1/tareas/123
+     */
     public void obtenerTarea(Context ctx) {
         try {
             Long id = Long.parseLong(ctx.pathParam("id"));
@@ -69,6 +115,27 @@ public class TareaController {
         }
     }
 
+    /**
+     * Endpoint: Crea una nueva tarea.
+     * <p>
+     * Registra una nueva tarea con asignación a trabajador,
+     * descripción detallada y fechas estimadas.
+     * </p>
+     *
+     * @param ctx Contexto de Javalin con la petición HTTP
+     * @example
+     * POST /api/v1/tareas
+     * Body:
+     * {
+     *     "titulo": "Ensamblar mesa de centro",
+     *     "descripcion": "Ensamblar piezas cortadas de mesa de roble",
+     *     "trabajadorAsignado": "TRAB001",
+     *     "prioridad": "ALTA",
+     *     "fechaLimite": "2024-12-15",
+     *     "estimadoHoras": 4,
+     *     "estado": "PENDIENTE"
+     * }
+     */
     public void crearTarea(Context ctx) {
         try {
             Tarea tarea = ctx.bodyAsClass(Tarea.class);
@@ -87,6 +154,18 @@ public class TareaController {
         }
     }
 
+    /**
+     * Endpoint: Actualiza el estado de una tarea.
+     * <p>
+     * Permite cambiar el estado de una tarea según el flujo de trabajo:
+     * PENDIENTE → EN_PROGRESO → COMPLETADA → VERIFICADA.
+     * </p>
+     *
+     * @param ctx Contexto de Javalin con la petición HTTP
+     * @example
+     * PATCH /api/v1/tareas/123/estado
+     * Body: { "estado": "EN_PROGRESO" }
+     */
     public void actualizarEstado(Context ctx) {
         try {
             Long id = Long.parseLong(ctx.pathParam("id"));
@@ -115,6 +194,16 @@ public class TareaController {
         }
     }
 
+    /**
+     * Endpoint: Elimina una tarea del sistema.
+     * <p>
+     * Realiza una eliminación lógica de la tarea, solo permitida
+     * para tareas en estado inicial o canceladas.
+     * </p>
+     *
+     * @param ctx Contexto de Javalin con la petición HTTP
+     * @example DELETE /api/v1/tareas/123
+     */
     public void eliminarTarea(Context ctx) {
         try {
             Long id = Long.parseLong(ctx.pathParam("id"));
@@ -137,6 +226,18 @@ public class TareaController {
         }
     }
 
+    /**
+     * Endpoint: Actualiza completamente una tarea existente.
+     * <p>
+     * Permite modificar cualquier campo de una tarea excepto
+     * el historial de cambios de estado.
+     * </p>
+     *
+     * @param ctx Contexto de Javalin con la petición HTTP
+     * @example
+     * PUT /api/v1/tareas/123
+     * Body: { ...tarea completa actualizada... }
+     */
     public void actualizarTarea(Context ctx) {
         try {
             Long id = Long.parseLong(ctx.pathParam("id"));

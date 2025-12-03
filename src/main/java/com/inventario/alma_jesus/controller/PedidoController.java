@@ -5,19 +5,63 @@ import com.inventario.alma_jesus.service.PedidoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
-
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Controlador para gestionar las operaciones relacionadas con pedidos de clientes.
+ * <p>
+ * Esta clase maneja el ciclo de vida completo de los pedidos, desde la creación
+ * hasta el seguimiento de etapas, filtrado por fecha y eliminación.
+ * </p>
+ *
+ * @version 1.0
+ * @since 2024
+ * @see PedidoService
+ * @see Pedido
+ */
 public class PedidoController {
+    /**
+     * Servicio que contiene la lógica de negocio para la gestión de pedidos.
+     */
     private final PedidoService pedidoService;
+    /**
+     * Mapper para convertir entre JSON y objetos Java.
+     */
     private final ObjectMapper objectMapper;
-
+    /**
+     * Constructor del controlador de pedidos.
+     *
+     * @param pedidoService Instancia del servicio de pedidos
+     */
     public PedidoController(PedidoService pedidoService) {
         this.pedidoService = pedidoService;
         this.objectMapper = new ObjectMapper();
     }
 
+    /**
+     * Handler para listar pedidos filtrados por fecha específica.
+     * <p>
+     * Retorna todos los pedidos cuya fecha coincide con la proporcionada
+     * en el parámetro de consulta. Formato de fecha: YYYY-MM-DD.
+     * </p>
+     *
+     * @param fecha Parámetro de consulta requerido con la fecha en formato YYYY-MM-DD
+     *
+     * @example
+     * Petición GET: /api/v1/pedidos/fecha?fecha=2025-11-23
+     *
+     * Respuesta exitosa (200):
+     * <pre>
+     * {
+     *     "success": true,
+     *     "data": [...],
+     *     "total": 3,
+     *     "fecha": "2025-11-23",
+     *     "message": "3 pedidos encontrados para la fecha 2025-11-23"
+     * }
+     * </pre>
+     */
     // NUEVO HANDLER: Listar pedidos por fecha
     public Handler listarPedidosPorFecha = new Handler() {
         @Override
@@ -58,6 +102,16 @@ public class PedidoController {
         }
     };
 
+    /**
+     * Handler para listar todos los pedidos del sistema.
+     * <p>
+     * Retorna la lista completa de pedidos sin filtros, ordenados
+     * por fecha de creación descendente.
+     * </p>
+     *
+     * @example
+     * Petición GET: /api/v1/pedidos
+     */
     public Handler listarPedidos = new Handler() {
         @Override
         public void handle(Context ctx) throws Exception {
@@ -79,6 +133,17 @@ public class PedidoController {
         }
     };
 
+    /**
+     * Handler para obtener un pedido específico por ID.
+     * <p>
+     * Retorna todos los detalles de un pedido incluyendo items,
+     * historial de etapas y datos del cliente.
+     * </p>
+     *
+     * @param id Parámetro de ruta con el ID numérico del pedido
+     *
+     * @throws NumberFormatException Si el ID no es un número válido
+     */
     public Handler obtenerPedido = new Handler() {
         @Override
         public void handle(Context ctx) throws Exception {
@@ -106,6 +171,29 @@ public class PedidoController {
         }
     };
 
+    /**
+     * Handler para crear un nuevo pedido.
+     * <p>
+     * Registra un pedido completo incluyendo items, datos del cliente
+     * y configuración inicial de la primera etapa.
+     * </p>
+     *
+     * @example
+     * Petición POST: /api/v1/pedidos
+     * Body:
+     * <pre>
+     * {
+     *     "cliente": "Juan Pérez",
+     *     "telefono": "555-1234",
+     *     "correo": "juan@email.com",
+     *     "descripcion": "Mesa de centro en roble",
+     *     "etapa": "recepcion",
+     *     "items": [
+     *         {"producto": "Mesa de centro", "cantidad": 1, "precio": 2500}
+     *     ]
+     * }
+     * </pre>
+     */
     public Handler crearPedido = new Handler() {
         @Override
         public void handle(Context ctx) throws Exception {
@@ -129,6 +217,27 @@ public class PedidoController {
         }
     };
 
+    /**
+     * Handler para actualizar la etapa de un pedido.
+     * <p>
+     * Avanza o cambia la etapa de un pedido en el flujo de trabajo,
+     * registrando la fecha del cambio y notas opcionales.
+     * </p>
+     *
+     * @param id Parámetro de ruta con el ID del pedido
+     * @param etapa Nueva etapa a asignar (requerida)
+     * @param notas Notas opcionales sobre el cambio de etapa
+     *
+     * @example
+     * Petición PUT: /api/v1/pedidos/789/etapa
+     * Body:
+     * <pre>
+     * {
+     *     "etapa": "produccion",
+     *     "notas": "Asignado al equipo de carpintería"
+     * }
+     * </pre>
+     */
     public Handler actualizarEtapa = new Handler() {
         @Override
         public void handle(Context ctx) throws Exception {
@@ -166,6 +275,15 @@ public class PedidoController {
         }
     };
 
+    /**
+     * Handler para eliminar un pedido.
+     * <p>
+     * Elimina permanentemente un pedido del sistema.
+     * Solo se permite para pedidos en etapa inicial o cancelados.
+     * </p>
+     *
+     * @param id Parámetro de ruta con el ID del pedido a eliminar
+     */
     public Handler eliminarPedido = new Handler() {
         @Override
         public void handle(Context ctx) throws Exception {

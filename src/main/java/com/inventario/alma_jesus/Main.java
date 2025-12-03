@@ -13,7 +13,50 @@ import com.inventario.alma_jesus.router.PedidoRouter;
 import com.inventario.alma_jesus.router.EstadisticasRouter;
 import io.javalin.Javalin;
 
+/**
+ * Clase principal de la aplicación de gestión de inventario "Alma Jesús".
+ * <p>
+ * Esta clase inicia el servidor Javalin y configura todas las rutas de la API REST.
+ * El sistema gestiona inventario, ventas, reparaciones, tareas, pedidos y estadísticas
+ * para un taller o negocio de reparaciones.
+ * </p>
+ *
+ * @version 1.0
+ * @since 2024
+ */
+
 public class Main {
+
+    /**
+     * Método principal que inicia la aplicación.
+     * <p>
+     * Configura el servidor Javalin en el puerto 7000, habilita CORS para todas las rutas
+     * y registra todos los routers de los diferentes módulos del sistema.
+     * </p>
+     *
+     * @param args Argumentos de línea de comandos (no utilizados)
+     *
+     * @see AuthRouter
+     * @see UsuarioRouter
+     * @see ProductoRouter
+     * @see VentaRouter
+     * @see HerramientaRouter
+     * @see MateriaPrimaRouter
+     * @see ReparacionRouter
+     * @see RecetarioRouter
+     * @see TareaRouter
+     * @see PedidoRouter
+     * @see EstadisticasRouter
+     *
+     * @example
+     * Para ejecutar la aplicación:
+     * <pre>
+     * java -jar inventario-alma-jesus.jar
+     * </pre>
+     *
+     * La aplicación estará disponible en: http://localhost:7000
+     */
+
     public static void main(String[] args) {
         Javalin app = Javalin.create(config -> {
             config.plugins.enableCors(cors -> {
@@ -22,6 +65,8 @@ public class Main {
                 });
             });
         }).start(7000);
+
+        // Registrar todas las rutas de los diferentes módulos
 
         AuthRouter authRouter = new AuthRouter();
         authRouter.configureRoutes(app);
@@ -54,6 +99,7 @@ public class Main {
         EstadisticasRouter estadisticasRouter = new EstadisticasRouter();
         estadisticasRouter.configureRoutes(app);
 
+        // Imprimir información del servidor y endpoints disponibles
         System.out.println("Servidor corriendo en: http://localhost:7000");
         System.out.println("ENDPOINTS AUTENTICACION");
         System.out.println("POST http://localhost:7000/api/v1/auth/login");

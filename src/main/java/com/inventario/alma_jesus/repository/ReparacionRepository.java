@@ -6,10 +6,54 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Repositorio para gestionar las operaciones de base de datos relacionadas con reparaciones.
+ * <p>
+ * Esta clase implementa el patrón Repository para la entidad Reparacion,
+ * proporcionando métodos CRUD completos con soporte para filtros avanzados,
+ * gestión de estados y operaciones específicas del ciclo de vida de reparaciones.
+ * </p>
+ *
+ * @version 1.0
+ * @since 2024
+ * @see Reparacion
+ * @see DatabaseConnection
+ */
 public class ReparacionRepository {
 
+    /**
+     * Constructor por defecto.
+     * Crea una nueva instancia del repositorio de reparaciones.
+     */
     public ReparacionRepository() {}
 
+    /**
+     * Obtiene todas las reparaciones activas con filtros opcionales.
+     * <p>
+     * Retorna una lista de reparaciones que pueden ser filtradas por estado,
+     * nombre de cliente o modelo del artículo. Las reparaciones se ordenan
+     * por fecha de registro descendente (más recientes primero).
+     * </p>
+     *
+     * @param estado Estado de la reparación a filtrar (opcional)
+     * @param cliente Nombre o parte del nombre del cliente (opcional)
+     * @param modelo Modelo o parte del modelo del artículo (opcional)
+     * @return Lista de reparaciones que cumplen con los criterios
+     *
+     * @throws RuntimeException Si ocurre un error en la consulta SQL
+     *
+     * @example
+     * <pre>
+     * // Obtener reparaciones pendientes
+     * List<Reparacion> pendientes = repository.findAll("Pendiente", null, null);
+     *
+     * // Buscar reparaciones de un cliente específico
+     * List<Reparacion> clienteRep = repository.findAll(null, "Juan", null);
+     *
+     * // Filtrar por modelo y estado
+     * List<Reparacion> sillasPend = repository.findAll("Pendiente", null, "Silla");
+     * </pre>
+     */
     public List<Reparacion> findAll(String estado, String cliente, String modelo) {
         List<Reparacion> reparaciones = new ArrayList<>();
 
@@ -51,6 +95,18 @@ public class ReparacionRepository {
         return reparaciones;
     }
 
+    /**
+     * Busca una reparación específica por su ID.
+     * <p>
+     * Retorna un Optional que contiene la reparación si se encuentra
+     * y está activa, o un Optional vacío si no existe o está inactiva.
+     * </p>
+     *
+     * @param id ID numérico de la reparación a buscar
+     * @return Optional con la reparación si se encuentra, vacío si no
+     *
+     * @throws RuntimeException Si ocurre un error en la consulta SQL
+     */
     public Optional<Reparacion> findById(Long id) {
         if (id == null) {
             return Optional.empty();
@@ -76,6 +132,29 @@ public class ReparacionRepository {
         return Optional.empty();
     }
 
+    /**
+     * Guarda una nueva reparación en la base de datos.
+     * <p>
+     * Inserta un nuevo registro de reparación con todos los atributos
+     * proporcionados. Asigna automáticamente el ID generado por la base de datos
+     * y establece valores por defecto para campos opcionales.
+     * </p>
+     *
+     * @param reparacion Objeto Reparacion con los datos a guardar
+     * @return La misma reparación con el ID asignado
+     *
+     * @throws RuntimeException Si ocurre un error en la inserción SQL
+     * @throws SQLException Si no se afecta ninguna fila en la inserción
+     *
+     * @example
+     * <pre>
+     * Reparacion nuevaRep = new Reparacion("Juan Pérez", "555-1234", "Silla ejecutiva",
+     *                                      "Madera", "Patas flojas", 350, 100, "2024-12-15",
+     *                                      "Necesita refuerzo en patas");
+     * Reparacion guardada = repository.save(nuevaRep);
+     * // guardada.getId() ahora contiene el ID asignado por la BD
+     * </pre>
+     */
     public Reparacion save(Reparacion reparacion) {
         if (reparacion == null) {
             throw new RuntimeException("Reparacion no puede ser null");
@@ -124,6 +203,18 @@ public class ReparacionRepository {
         }
     }
 
+    /**
+     * Actualiza completamente una reparación existente.
+     * <p>
+     * Modifica todos los campos editables de una reparación excepto
+     * los campos de auditoría (creado_por, fecha_registro) y el ID.
+     * </p>
+     *
+     * @param reparacion Objeto Reparacion con los datos actualizados
+     * @return true si la reparación se actualizó exitosamente, false en caso contrario
+     *
+     * @throws RuntimeException Si ocurre un error en la actualización SQL
+     */
     public boolean update(Reparacion reparacion) {
         if (reparacion == null || reparacion.getId() == null) {
             return false;
@@ -158,6 +249,19 @@ public class ReparacionRepository {
         }
     }
 
+    /**
+     * Actualiza el estado de una reparación específica.
+     * <p>
+     * Cambia únicamente el campo de estado de una reparación,
+     * utilizado para avanzar en el flujo de trabajo (Pendiente → En Proceso → Completada → Entregada).
+     * </p>
+     *
+     * @param id ID de la reparación a actualizar
+     * @param nuevoEstado Nuevo estado a asignar a la reparación
+     * @return true si el estado se actualizó exitosamente, false en caso contrario
+     *
+     * @throws RuntimeException Si ocurre un error en la actualización SQL
+     */
     public boolean updateEstado(Long id, String nuevoEstado) {
         if (id == null || nuevoEstado == null) {
             return false;
@@ -178,6 +282,18 @@ public class ReparacionRepository {
         }
     }
 
+    /**
+     * Realiza una eliminación lógica de una reparación.
+     * <p>
+     * Marca la reparación como inactiva en lugar de eliminarla físicamente,
+     * preservando el historial y referencias en el sistema.
+     * </p>
+     *
+     * @param id ID de la reparación a eliminar
+     * @return true si la reparación se eliminó exitosamente, false en caso contrario
+     *
+     * @throws RuntimeException Si ocurre un error en la actualización SQL
+     */
     public boolean delete(Long id) {
         if (id == null) {
             return false;
@@ -197,6 +313,17 @@ public class ReparacionRepository {
         }
     }
 
+    /**
+     * Convierte un ResultSet de base de datos a un objeto Reparacion.
+     * <p>
+     * Método auxiliar que mapea los campos de la tabla reparacion
+     * a las propiedades del modelo correspondiente.
+     * </p>
+     *
+     * @param rs ResultSet con los datos obtenidos de la base de datos
+     * @return Objeto Reparacion poblado con los datos del ResultSet
+     * @throws SQLException Si ocurre un error al leer los datos del ResultSet
+     */
     private Reparacion mapResultSetToReparacion(ResultSet rs) throws SQLException {
         Reparacion reparacion = new Reparacion();
         reparacion.setId(rs.getLong("id"));

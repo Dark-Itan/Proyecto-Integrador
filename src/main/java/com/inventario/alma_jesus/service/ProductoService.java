@@ -9,9 +9,23 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
+/**
+ * Servicio para la gestión de productos en el sistema de inventario.
+ * Proporciona métodos CRUD completos para productos, incluyendo manejo de imágenes
+ * y operaciones específicas como publicación de precios.
+ *
+ * @author Alma & Jesús
+ * @version 1.0
+ * @since 2024
+ */
 public class ProductoService {
     private ProductoRepository productoRepository = new ProductoRepository();
 
+    /**
+     * Obtiene todos los productos activos del sistema.
+     *
+     * @return Mapa con los productos y metadatos de la operación.
+     */
     public Map<String, Object> listarProductos() {
         Map<String, Object> response = new HashMap<>();
 
@@ -51,6 +65,12 @@ public class ProductoService {
         return response;
     }
 
+    /**
+     * Filtra productos por tipo específico.
+     *
+     * @param tipo Tipo de producto a filtrar (ej: "religiosas").
+     * @return Mapa con los productos filtrados por tipo.
+     */
     public Map<String, Object> listarProductosPorTipo(String tipo) {
         Map<String, Object> response = new HashMap<>();
 
@@ -84,6 +104,12 @@ public class ProductoService {
         return response;
     }
 
+    /**
+     * Obtiene un producto específico por su ID.
+     *
+     * @param id ID del producto a buscar.
+     * @return Mapa con el producto encontrado o mensaje de error.
+     */
     public Map<String, Object> obtenerProductoPorId(int id) {
         Map<String, Object> response = new HashMap<>();
 
@@ -125,6 +151,12 @@ public class ProductoService {
         return response;
     }
 
+    /**
+     * Crea un nuevo producto en el sistema.
+     *
+     * @param productoData Mapa con los datos del nuevo producto.
+     * @return Mapa con el resultado de la operación.
+     */
     public Map<String, Object> crearProducto(Map<String, Object> productoData) {
         Map<String, Object> response = new HashMap<>();
 
@@ -176,6 +208,13 @@ public class ProductoService {
         return response;
     }
 
+    /**
+     * Actualiza los datos de un producto existente.
+     *
+     * @param id ID del producto a actualizar.
+     * @param productoData Mapa con los nuevos datos del producto.
+     * @return Mapa con el resultado de la operación.
+     */
     public Map<String, Object> actualizarProducto(int id, Map<String, Object> productoData) {
         Map<String, Object> response = new HashMap<>();
 
@@ -240,6 +279,12 @@ public class ProductoService {
         return response;
     }
 
+    /**
+     * Elimina un producto del sistema.
+     *
+     * @param id ID del producto a eliminar.
+     * @return Mapa con el resultado de la operación.
+     */
     public Map<String, Object> eliminarProducto(int id) {
         Map<String, Object> response = new HashMap<>();
 
@@ -275,6 +320,11 @@ public class ProductoService {
         return response;
     }
 
+    /**
+     * Publica los precios de los productos en el catálogo.
+     *
+     * @return Mapa con el resultado de la operación.
+     */
     public Map<String, Object> publicarPrecios() {
         Map<String, Object> response = new HashMap<>();
 
@@ -299,6 +349,13 @@ public class ProductoService {
         return response;
     }
 
+    /**
+     * Sube una imagen a Cloudinary y devuelve la URL.
+     *
+     * @param fileBytes Bytes del archivo de imagen.
+     * @param fileName Nombre del archivo.
+     * @return Mapa con la URL de la imagen subida.
+     */
     public Map<String, Object> subirImagen(byte[] fileBytes, String fileName) {
         Map<String, Object> response = new HashMap<>();
 

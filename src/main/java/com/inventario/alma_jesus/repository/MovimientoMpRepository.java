@@ -6,9 +6,29 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Repositorio para la gestión de movimientos de materia prima.
+ * <p>
+ * Esta clase maneja el historial de movimientos (entradas, salidas, ajustes)
+ * de materiales en el sistema de inventario. Cada movimiento registra cambios
+ * en el stock de materias primas con fines de trazabilidad y control.
+ * </p>
+ *
+ * @version 1.0
+ * @since 2024
+ */
 public class MovimientoMpRepository {
     private final Connection connection;
 
+    /**
+     * Constructor del repositorio.
+     * <p>
+     * Establece la conexión a la base de datos utilizando {@link DatabaseConnection}.
+     * Lanza una excepción si no puede establecer la conexión.
+     * </p>
+     *
+     * @throws RuntimeException Si ocurre un error al conectar con la base de datos
+     */
     public MovimientoMpRepository() {
         try {
             this.connection = DatabaseConnection.getConnection();
@@ -18,11 +38,23 @@ public class MovimientoMpRepository {
         }
     }
 
-    // Endpoint 30: Ver historial de movimientos
+    /**
+     * Obtiene el historial de movimientos para un material específico.
+     * <p>
+     * Retorna todos los movimientos registrados para un material,
+     * ordenados por fecha descendente (los más recientes primero).
+     * Incluye movimientos de tipo "entrada", "salida", "consumo", "ajuste", etc.
+     * </p>
+     *
+     * @param materiaId ID del material para el cual obtener el historial
+     * @return Lista de {@link MovimientoMp} ordenados por fecha descendente
+     * @throws RuntimeException Si ocurre un error en la consulta SQL
+     * @see MovimientoMp
+     */
     public List<MovimientoMp> findByMateriaId(Long materiaId) {
         System.out.println(" [MOVIMIENTO-REPO] Obteniendo historial para material ID: " + materiaId);
         List<MovimientoMp> movimientos = new ArrayList<>();
-        // CAMBIADO: "MovimientoMp" por "movimientomp"
+        // Nota: El nombre de la tabla es "movimientomp" (en minúsculas)
         String sql = "SELECT * FROM movimientomp WHERE materia_id = ? ORDER BY fecha DESC, fecha_registro DESC";
 
         System.out.println("[MOVIMIENTO-REPO] SQL: " + sql);
@@ -44,11 +76,27 @@ public class MovimientoMpRepository {
         return movimientos;
     }
 
-    // Registrar movimiento (se usará internamente)
+    /**
+     * Registra un nuevo movimiento de materia prima.
+     * <p>
+     * Inserta un registro de movimiento en la base de datos y establece
+     * el ID generado en el objeto movimiento. Los tipos de movimiento
+     * comunes incluyen:
+     * - "entrada": Compra o ingreso de material
+     * - "salida": Venta o retiro de material
+     * - "consumo": Uso en producción
+     * - "ajuste": Corrección manual de inventario
+     * </p>
+     *
+     * @param movimiento Objeto {@link MovimientoMp} a registrar
+     * @return El mismo objeto con el ID generado establecido
+     * @throws RuntimeException Si ocurre un error en la inserción SQL
+     * @throws IllegalArgumentException Si algún campo requerido es nulo o inválido
+     */
     public MovimientoMp save(MovimientoMp movimiento) {
         System.out.println("[MOVIMIENTO-REPO] Registrando movimiento - Material: " + movimiento.getMateriaId() +
                 ", Tipo: " + movimiento.getTipo() + ", Cantidad: " + movimiento.getCantidad());
-        // CAMBIADO: "MovimientoMp" por "movimientomp"
+        // Nota: El nombre de la tabla es "movimientomp" (en minúsculas)
         String sql = "INSERT INTO movimientomp (materia_id, fecha, tipo, cantidad, usuario_id) " +
                 "VALUES (?, ?, ?, ?, ?)";
 
@@ -80,6 +128,18 @@ public class MovimientoMpRepository {
         }
     }
 
+    /**
+     * Mapea un ResultSet a un objeto MovimientoMp.
+     * <p>
+     * Método privado auxiliar para convertir filas de base de datos
+     * a objetos del dominio. Extrae todos los campos de la tabla
+     * "movimientomp" y los asigna al objeto correspondiente.
+     * </p>
+     *
+     * @param rs ResultSet con los datos del movimiento
+     * @return Objeto {@link MovimientoMp} mapeado
+     * @throws SQLException Si ocurre un error al acceder a los datos del ResultSet
+     */
     private MovimientoMp mapResultSetToMovimiento(ResultSet rs) throws SQLException {
         MovimientoMp movimiento = new MovimientoMp();
         movimiento.setId(rs.getLong("id"));

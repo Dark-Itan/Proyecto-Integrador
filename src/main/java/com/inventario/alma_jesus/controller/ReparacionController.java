@@ -6,15 +6,56 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.javalin.http.Context;
 import java.util.*;
 
+/**
+ * Controlador para gestionar las operaciones relacionadas con reparaciones de clientes.
+ * <p>
+ * Esta clase maneja el ciclo completo de las reparaciones, desde la recepción del artículo
+ * hasta la entrega final, incluyendo seguimiento de estados, generación de recibos
+ * y gestión de pagos.
+ * </p>
+ *
+ * @version 1.0
+ * @since 2024
+ * @see ReparacionService
+ * @see Reparacion
+ */
 public class ReparacionController {
+
+    /**
+     * Servicio que contiene la lógica de negocio para la gestión de reparaciones.
+     */
     private final ReparacionService reparacionService;
+
+    /**
+     * Mapper para convertir entre JSON y objetos Java.
+     */
     private final ObjectMapper objectMapper;
 
+    /**
+     * Constructor por defecto del controlador de reparaciones.
+     * Inicializa el servicio y el object mapper.
+     */
     public ReparacionController() {
         this.reparacionService = new ReparacionService();
         this.objectMapper = new ObjectMapper();
     }
 
+    /**
+     * Endpoint: Lista todas las reparaciones con opciones de filtrado.
+     * <p>
+     * Permite listar reparaciones con filtros por estado, cliente o modelo.
+     * Útil para dashboards y reportes de seguimiento.
+     * </p>
+     *
+     * @param ctx Contexto de Javalin con la petición HTTP
+     *
+     * @param estado Parámetro de consulta opcional para filtrar por estado
+     * @param cliente Parámetro de consulta opcional para filtrar por nombre de cliente
+     * @param modelo Parámetro de consulta opcional para filtrar por modelo del artículo
+     *
+     * @example
+     * Petición GET: /api/v1/reparaciones?estado=pendiente&cliente=Juan
+     */
     public void listarReparaciones(Context ctx) {
         try {
             System.out.println("Listando reparaciones");
@@ -45,6 +86,20 @@ public class ReparacionController {
         }
     }
 
+    /**
+     * Endpoint: Obtiene una reparación específica por ID.
+     * <p>
+     * Retorna todos los detalles de una reparación incluyendo
+     * información del cliente, descripción del problema, diagnóstico,
+     * costos y saldo pendiente.
+     * </p>
+     *
+     * @param ctx Contexto de Javalin con la petición HTTP
+     *
+     * @param id Parámetro de ruta con el ID numérico de la reparación
+     *
+     * @throws NumberFormatException Si el ID no es un número válido
+     */
     public void obtenerReparacion(Context ctx) {
         try {
             Long id = Long.parseLong(ctx.pathParam("id"));
@@ -89,6 +144,32 @@ public class ReparacionController {
         }
     }
 
+    /**
+     * Endpoint: Crea una nueva reparación.
+     * <p>
+     * Registra una nueva entrada de reparación con los datos del cliente,
+     * descripción del problema y artículo a reparar.
+     * </p>
+     *
+     * @param ctx Contexto de Javalin con la petición HTTP
+     *
+     * @example
+     * Petición POST: /api/v1/reparaciones
+     * Body:
+     * <pre>
+     * {
+     *     "nombreCliente": "Juan Pérez",
+     *     "telefono": "555-1234",
+     *     "email": "juan@email.com",
+     *     "articulo": "Silla de madera",
+     *     "marca": "Muebles Finos",
+     *     "modelo": "SF-2023",
+     *     "descripcionProblema": "Patas flojas, necesita refuerzo",
+     *     "diagnosticoInicial": "Tornillos flojos, necesita reemplazo",
+     *     "costoEstimado": 350.00
+     * }
+     * </pre>
+     */
     public void crearReparacion(Context ctx) {
         try {
             System.out.println("Creando nueva reparacion");
@@ -129,6 +210,17 @@ public class ReparacionController {
         }
     }
 
+    /**
+     * Endpoint: Actualiza la información de una reparación existente.
+     * <p>
+     * Permite modificar cualquier campo de una reparación excepto
+     * el historial de pagos y cambios de estado.
+     * </p>
+     *
+     * @param ctx Contexto de Javalin con la petición HTTP
+     *
+     * @param id Parámetro de ruta con el ID de la reparación a actualizar
+     */
     public void actualizarReparacion(Context ctx) {
         try {
             Long id = Long.parseLong(ctx.pathParam("id"));
@@ -177,6 +269,18 @@ public class ReparacionController {
         }
     }
 
+    /**
+     * Endpoint: Cambia el estado de una reparación.
+     * <p>
+     * Permite avanzar la reparación por el flujo de estados:
+     * recepción → diagnóstico → reparación → prueba → terminado → entregado.
+     * </p>
+     *
+     * @param ctx Contexto de Javalin con la petición HTTP
+     *
+     * @param id Parámetro de ruta con el ID de la reparación
+     * @param estado Nuevo estado a asignar (requerido)
+     */
     public void cambiarEstado(Context ctx) {
         try {
             Long id = Long.parseLong(ctx.pathParam("id"));
@@ -227,6 +331,15 @@ public class ReparacionController {
         }
     }
 
+    /**
+     * Endpoint: Obtiene el historial completo de una reparación.
+     * <p>
+     * Retorna la línea de tiempo con todos los cambios de estado,
+     * actualizaciones, pagos y notas realizadas en la reparación.
+     * </p>
+     *
+     * @param ctx Contexto de Javalin con la petición HTTP
+     */
     public void obtenerHistorial(Context ctx) {
         try {
             Long id = Long.parseLong(ctx.pathParam("id"));
@@ -261,6 +374,15 @@ public class ReparacionController {
         }
     }
 
+    /**
+     * Endpoint: Genera un recibo detallado de la reparación.
+     * <p>
+     * Crea un documento con todos los cargos, pagos, saldo pendiente
+     * e información fiscal para entrega al cliente.
+     * </p>
+     *
+     * @param ctx Contexto de Javalin con la petición HTTP
+     */
     public void generarRecibo(Context ctx) {
         try {
             Long id = Long.parseLong(ctx.pathParam("id"));
@@ -295,6 +417,15 @@ public class ReparacionController {
         }
     }
 
+    /**
+     * Endpoint: Elimina una reparación del sistema.
+     * <p>
+     * Realiza una eliminación lógica de la reparación, solo permitida
+     * para reparaciones en estado inicial o canceladas.
+     * </p>
+     *
+     * @param ctx Contexto de Javalin con la petición HTTP
+     */
     public void eliminarReparacion(Context ctx) {
         try {
             Long id = Long.parseLong(ctx.pathParam("id"));

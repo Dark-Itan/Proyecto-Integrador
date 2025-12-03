@@ -4,6 +4,16 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Modelo que representa un pedido de fabricación en el sistema.
+ * <p>
+ * Esta clase gestiona pedidos de clientes para productos personalizados o estándar,
+ * incluyendo seguimiento de etapas de producción, pagos y detalles del cliente.
+ * </p>
+ *
+ * @version 1.0
+ * @since 2024
+ */
 public class Pedido {
     private Long id;
     private String clienteNombre;
@@ -20,8 +30,34 @@ public class Pedido {
     private LocalDateTime fechaActualizacion;
     private List<PedidoProducto> productos;
 
+    /**
+     * Constructor por defecto.
+     * <p>
+     * Crea una instancia vacía de pedido.
+     * Los valores deben establecerse mediante los setters correspondientes.
+     * </p>
+     */
     public Pedido() {}
 
+    /**
+     * Constructor principal para crear un pedido.
+     * <p>
+     * Este constructor excluye las fechas de creación/actualización
+     * y la lista de productos que se gestionan por separado.
+     * </p>
+     *
+     * @param id Identificador único del pedido
+     * @param clienteNombre Nombre completo del cliente
+     * @param clienteContacto Teléfono o email de contacto del cliente
+     * @param fechaEntrega Fecha estimada de entrega en formato "YYYY-MM-DD"
+     * @param notas Notas adicionales o especificaciones del pedido
+     * @param etapa Etapa actual del proceso de producción
+     * @param total Monto total del pedido
+     * @param anticipo Anticipo o pago inicial recibido
+     * @param totalCantidad Cantidad total de productos en el pedido
+     * @param resumenProducto Descripción resumida de los productos solicitados
+     * @param creadoPor ID del usuario que creó el pedido
+     */
     public Pedido(Long id, String clienteNombre, String clienteContacto, String fechaEntrega,
                   String notas, String etapa, BigDecimal total, BigDecimal anticipo,
                   Integer totalCantidad, String resumenProducto, String creadoPor) {
@@ -39,45 +75,300 @@ public class Pedido {
     }
 
     // Getters y Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
 
-    public String getClienteNombre() { return clienteNombre; }
-    public void setClienteNombre(String clienteNombre) { this.clienteNombre = clienteNombre; }
+    /**
+     * Obtiene el identificador único del pedido.
+     *
+     * @return ID del pedido
+     */
+    public Long getId() {
+        return id;
+    }
 
-    public String getClienteContacto() { return clienteContacto; }
-    public void setClienteContacto(String clienteContacto) { this.clienteContacto = clienteContacto; }
+    /**
+     * Establece el identificador único del pedido.
+     *
+     * @param id ID único del pedido
+     */
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public String getFechaEntrega() { return fechaEntrega; }
-    public void setFechaEntrega(String fechaEntrega) { this.fechaEntrega = fechaEntrega; }
+    /**
+     * Obtiene el nombre completo del cliente.
+     *
+     * @return Nombre del cliente
+     */
+    public String getClienteNombre() {
+        return clienteNombre;
+    }
 
-    public String getNotas() { return notas; }
-    public void setNotas(String notas) { this.notas = notas; }
+    /**
+     * Establece el nombre completo del cliente.
+     *
+     * @param clienteNombre Nombre del cliente
+     */
+    public void setClienteNombre(String clienteNombre) {
+        this.clienteNombre = clienteNombre;
+    }
 
-    public String getEtapa() { return etapa; }
-    public void setEtapa(String etapa) { this.etapa = etapa; }
+    /**
+     * Obtiene la información de contacto del cliente.
+     * <p>
+     * Puede ser teléfono, email o ambos, según la preferencia del cliente.
+     * </p>
+     *
+     * @return Información de contacto
+     */
+    public String getClienteContacto() {
+        return clienteContacto;
+    }
 
-    public BigDecimal getTotal() { return total; }
-    public void setTotal(BigDecimal total) { this.total = total; }
+    /**
+     * Establece la información de contacto del cliente.
+     *
+     * @param clienteContacto Teléfono o email del cliente
+     */
+    public void setClienteContacto(String clienteContacto) {
+        this.clienteContacto = clienteContacto;
+    }
 
-    public BigDecimal getAnticipo() { return anticipo; }
-    public void setAnticipo(BigDecimal anticipo) { this.anticipo = anticipo; }
+    /**
+     * Obtiene la fecha estimada de entrega.
+     * <p>
+     * Formato esperado: "YYYY-MM-DD"
+     * </p>
+     *
+     * @return Fecha de entrega estimada
+     */
+    public String getFechaEntrega() {
+        return fechaEntrega;
+    }
 
-    public Integer getTotalCantidad() { return totalCantidad; }
-    public void setTotalCantidad(Integer totalCantidad) { this.totalCantidad = totalCantidad; }
+    /**
+     * Establece la fecha estimada de entrega.
+     *
+     * @param fechaEntrega Fecha en formato "YYYY-MM-DD"
+     */
+    public void setFechaEntrega(String fechaEntrega) {
+        this.fechaEntrega = fechaEntrega;
+    }
 
-    public String getResumenProducto() { return resumenProducto; }
-    public void setResumenProducto(String resumenProducto) { this.resumenProducto = resumenProducto; }
+    /**
+     * Obtiene las notas o especificaciones adicionales del pedido.
+     * <p>
+     * Incluye detalles como preferencias del cliente, colores, medidas
+     * personalizadas, o instrucciones especiales de fabricación.
+     * </p>
+     *
+     * @return Notas del pedido
+     */
+    public String getNotas() {
+        return notas;
+    }
 
-    public String getCreadoPor() { return creadoPor; }
-    public void setCreadoPor(String creadoPor) { this.creadoPor = creadoPor; }
+    /**
+     * Establece las notas o especificaciones adicionales del pedido.
+     *
+     * @param notas Notas y especificaciones
+     */
+    public void setNotas(String notas) {
+        this.notas = notas;
+    }
 
-    public LocalDateTime getFechaCreacion() { return fechaCreacion; }
-    public void setFechaCreacion(LocalDateTime fechaCreacion) { this.fechaCreacion = fechaCreacion; }
+    /**
+     * Obtiene la etapa actual del proceso de producción.
+     * <p>
+     * Etapas posibles:
+     * - "PENDIENTE": Pedido recibido, sin iniciar producción
+     * - "DISEÑO": En fase de diseño o planos
+     * - "CORTE": En proceso de corte de materiales
+     * - "ENSAMBLAJE": En ensamblaje de piezas
+     * - "ACABADO": Aplicación de acabados (barniz, pintura)
+     * - "INSTALACION": Instalación en sitio del cliente
+     * - "FINALIZADO": Pedido completado y entregado
+     * - "CANCELADO": Pedido cancelado por el cliente
+     * </p>
+     *
+     * @return Etapa actual del pedido
+     */
+    public String getEtapa() {
+        return etapa;
+    }
 
-    public LocalDateTime getFechaActualizacion() { return fechaActualizacion; }
-    public void setFechaActualizacion(LocalDateTime fechaActualizacion) { this.fechaActualizacion = fechaActualizacion; }
+    /**
+     * Establece la etapa actual del proceso de producción.
+     *
+     * @param etapa Etapa del pedido
+     */
+    public void setEtapa(String etapa) {
+        this.etapa = etapa;
+    }
 
-    public List<PedidoProducto> getProductos() { return productos; }
-    public void setProductos(List<PedidoProducto> productos) { this.productos = productos; }
+    /**
+     * Obtiene el monto total del pedido.
+     * <p>
+     * Usa {@link BigDecimal} para precisión en cálculos monetarios.
+     * </p>
+     *
+     * @return Monto total del pedido
+     */
+    public BigDecimal getTotal() {
+        return total;
+    }
+
+    /**
+     * Establece el monto total del pedido.
+     *
+     * @param total Monto total
+     */
+    public void setTotal(BigDecimal total) {
+        this.total = total;
+    }
+
+    /**
+     * Obtiene el anticipo o pago inicial recibido.
+     * <p>
+     * Generalmente se requiere para iniciar la producción.
+     * </p>
+     *
+     * @return Monto del anticipo
+     */
+    public BigDecimal getAnticipo() {
+        return anticipo;
+    }
+
+    /**
+     * Establece el anticipo o pago inicial recibido.
+     *
+     * @param anticipo Monto del anticipo
+     */
+    public void setAnticipo(BigDecimal anticipo) {
+        this.anticipo = anticipo;
+    }
+
+    /**
+     * Obtiene la cantidad total de productos en el pedido.
+     * <p>
+     * Suma de todas las cantidades de productos individuales.
+     * </p>
+     *
+     * @return Cantidad total de productos
+     */
+    public Integer getTotalCantidad() {
+        return totalCantidad;
+    }
+
+    /**
+     * Establece la cantidad total de productos en el pedido.
+     *
+     * @param totalCantidad Cantidad total
+     */
+    public void setTotalCantidad(Integer totalCantidad) {
+        this.totalCantidad = totalCantidad;
+    }
+
+    /**
+     * Obtiene un resumen descriptivo de los productos solicitados.
+     * <p>
+     * Texto breve que describe el pedido, útil para vistas rápidas
+     * sin cargar la lista completa de productos.
+     * </p>
+     *
+     * @return Resumen de productos
+     */
+    public String getResumenProducto() {
+        return resumenProducto;
+    }
+
+    /**
+     * Establece un resumen descriptivo de los productos solicitados.
+     *
+     * @param resumenProducto Descripción resumida
+     */
+    public void setResumenProducto(String resumenProducto) {
+        this.resumenProducto = resumenProducto;
+    }
+
+    /**
+     * Obtiene el ID del usuario que creó el pedido.
+     *
+     * @return ID del usuario creador
+     */
+    public String getCreadoPor() {
+        return creadoPor;
+    }
+
+    /**
+     * Establece el ID del usuario que creó el pedido.
+     *
+     * @param creadoPor ID del usuario
+     */
+    public void setCreadoPor(String creadoPor) {
+        this.creadoPor = creadoPor;
+    }
+
+    /**
+     * Obtiene la fecha y hora de creación del pedido.
+     *
+     * @return Fecha de creación
+     */
+    public LocalDateTime getFechaCreacion() {
+        return fechaCreacion;
+    }
+
+    /**
+     * Establece la fecha y hora de creación del pedido.
+     * <p>
+     * Normalmente se establece automáticamente por la base de datos.
+     * </p>
+     *
+     * @param fechaCreacion Fecha de creación
+     */
+    public void setFechaCreacion(LocalDateTime fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
+    }
+
+    /**
+     * Obtiene la fecha y hora de la última actualización.
+     *
+     * @return Fecha de última actualización
+     */
+    public LocalDateTime getFechaActualizacion() {
+        return fechaActualizacion;
+    }
+
+    /**
+     * Establece la fecha y hora de la última actualización.
+     * <p>
+     * Se actualiza automáticamente al modificar el pedido.
+     * </p>
+     *
+     * @param fechaActualizacion Fecha de actualización
+     */
+    public void setFechaActualizacion(LocalDateTime fechaActualizacion) {
+        this.fechaActualizacion = fechaActualizacion;
+    }
+
+    /**
+     * Obtiene la lista de productos incluidos en el pedido.
+     * <p>
+     * Cada elemento es un {@link PedidoProducto} con detalles
+     * específicos de cantidad, precio y especificaciones.
+     * </p>
+     *
+     * @return Lista de productos del pedido
+     */
+    public List<PedidoProducto> getProductos() {
+        return productos;
+    }
+
+    /**
+     * Establece la lista de productos incluidos en el pedido.
+     *
+     * @param productos Lista de productos
+     */
+    public void setProductos(List<PedidoProducto> productos) {
+        this.productos = productos;
+    }
 }

@@ -8,9 +8,23 @@ import java.util.HashMap;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * Servicio para la gestión de usuarios en el sistema.
+ * Proporciona métodos CRUD completos para usuarios, incluyendo validaciones,
+ * seguridad de contraseñas y restricciones de eliminación para usuarios principales.
+ *
+ * @author Alma & Jesús
+ * @version 1.0
+ * @since 2024
+ */
 public class UsuarioService {
     private UsuarioRepository usuarioRepository = new UsuarioRepository();
 
+    /**
+     * Lista todos los usuarios activos del sistema.
+     *
+     * @return Mapa con la lista de usuarios y metadatos de la operación.
+     */
     public Map<String, Object> listarUsuarios() {
         Map<String, Object> response = new HashMap<>();
 
@@ -46,6 +60,12 @@ public class UsuarioService {
         return response;
     }
 
+    /**
+     * Obtiene un usuario específico por su ID.
+     *
+     * @param id ID del usuario a buscar.
+     * @return Mapa con el usuario encontrado o mensaje de error.
+     */
     public Map<String, Object> obtenerUsuarioPorId(String id) {
         Map<String, Object> response = new HashMap<>();
 
@@ -83,6 +103,12 @@ public class UsuarioService {
         return response;
     }
 
+    /**
+     * Crea un nuevo usuario en el sistema con validaciones de unicidad.
+     *
+     * @param usuarioData Mapa con los datos del nuevo usuario.
+     * @return Mapa con el resultado de la operación.
+     */
     public Map<String, Object> crearUsuario(Map<String, String> usuarioData) {
         Map<String, Object> response = new HashMap<>();
 
@@ -95,7 +121,7 @@ public class UsuarioService {
                 return response;
             }
 
-            //VERIFICACIÓN MEJORADA: Checar si ID ya existe
+            // Verificación de ID único
             Optional<Usuario> usuarioConId = usuarioRepository.findById(usuarioData.get("id"));
             if (usuarioConId.isPresent()) {
                 response.put("success", false);
@@ -103,7 +129,7 @@ public class UsuarioService {
                 return response;
             }
 
-            // VERIFICACIÓN MEJORADA: Checar si username ya existe
+            // Verificación de username único
             Optional<Usuario> usuarioConUsername = usuarioRepository.findByUsername(usuarioData.get("username"));
             if (usuarioConUsername.isPresent()) {
                 response.put("success", false);
@@ -148,6 +174,13 @@ public class UsuarioService {
         return response;
     }
 
+    /**
+     * Cambia la contraseña de un usuario existente.
+     *
+     * @param id ID del usuario cuya contraseña se cambiará.
+     * @param nuevaPassword Nueva contraseña en texto plano.
+     * @return Mapa con el resultado de la operación.
+     */
     public Map<String, Object> cambiarPassword(String id, String nuevaPassword) {
         Map<String, Object> response = new HashMap<>();
 
@@ -162,7 +195,7 @@ public class UsuarioService {
 
             if (nuevaPassword == null || nuevaPassword.trim().isEmpty()) {
                 response.put("success", false);
-                response.put("message", "La nueva contrasena es requerida");
+                response.put("message", "La nueva contraseña es requerida");
                 return response;
             }
 
@@ -178,18 +211,24 @@ public class UsuarioService {
                 System.out.println("Contraseña cambiada para: " + usuarioOpt.get().getUsername());
             } else {
                 response.put("success", false);
-                response.put("message", "Error al actualizar contrasena");
+                response.put("message", "Error al actualizar contraseña");
             }
 
         } catch (Exception e) {
             e.printStackTrace();
             response.put("success", false);
-            response.put("message", "Error al cambiar contrasena: " + e.getMessage());
+            response.put("message", "Error al cambiar contraseña: " + e.getMessage());
         }
 
         return response;
     }
 
+    /**
+     * Elimina un usuario del sistema con restricciones para usuarios principales.
+     *
+     * @param id ID del usuario a eliminar.
+     * @return Mapa con el resultado de la operación.
+     */
     public Map<String, Object> eliminarUsuario(String id) {
         Map<String, Object> response = new HashMap<>();
 

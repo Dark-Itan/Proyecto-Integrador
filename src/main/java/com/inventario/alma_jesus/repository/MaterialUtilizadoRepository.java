@@ -7,14 +7,41 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Repositorio para la gestión de materiales utilizados en documentos.
+ * <p>
+ * Esta clase proporciona operaciones CRUD y consultas específicas
+ * para los registros de materiales utilizados en reparaciones y pedidos.
+ * Utiliza un pool de conexiones HikariCP para eficiencia.
+ * </p>
+ *
+ * @version 1.0
+ * @since 2024
+ */
 public class MaterialUtilizadoRepository {
     private final HikariDataSource dataSource;
 
+    /**
+     * Constructor del repositorio.
+     *
+     * @param dataSource Fuente de datos configurada con HikariCP
+     */
     public MaterialUtilizadoRepository(HikariDataSource dataSource) {
         this.dataSource = dataSource;
     }
 
-    // Buscar materiales por tipo de documento y ID
+    /**
+     * Busca materiales utilizados por tipo de documento y ID de documento.
+     * <p>
+     * Retorna los materiales ordenados por fecha de registro descendente
+     * (los más recientes primero).
+     * </p>
+     *
+     * @param tipoDocumento Tipo de documento (reparacion o pedido)
+     * @param documentoId ID del documento relacionado
+     * @return Lista de {@link MaterialUtilizado} encontrados
+     * @throws RuntimeException Si ocurre un error en la consulta SQL
+     */
     public List<MaterialUtilizado> findByTipoDocumentoAndDocumentoIdOrderByFechaRegistroDesc(
             MaterialUtilizado.TipoDocumento tipoDocumento, Long documentoId) {
         List<MaterialUtilizado> materiales = new ArrayList<>();
@@ -36,13 +63,33 @@ public class MaterialUtilizadoRepository {
         return materiales;
     }
 
-    // Buscar materiales por reparación
+    /**
+     * Busca materiales utilizados por tipo de documento y ID de documento.
+     * <p>
+     * Método de conveniencia que delega en {@link #findByTipoDocumentoAndDocumentoIdOrderByFechaRegistroDesc}.
+     * </p>
+     *
+     * @param tipoDocumento Tipo de documento (reparacion o pedido)
+     * @param documentoId ID del documento relacionado
+     * @return Lista de {@link MaterialUtilizado} encontrados
+     * @see #findByTipoDocumentoAndDocumentoIdOrderByFechaRegistroDesc
+     */
     public List<MaterialUtilizado> findByTipoDocumentoAndDocumentoId(
             MaterialUtilizado.TipoDocumento tipoDocumento, Long documentoId) {
         return findByTipoDocumentoAndDocumentoIdOrderByFechaRegistroDesc(tipoDocumento, documentoId);
     }
 
-    // Calcular costo total de materiales por reparación
+    /**
+     * Calcula el costo total de materiales utilizados en una reparación.
+     * <p>
+     * Suma el producto de cantidad × costo_unitario para todos los materiales
+     * asociados a una reparación específica.
+     * </p>
+     *
+     * @param reparacionId ID de la reparación
+     * @return Costo total en centavos, o 0 si no hay materiales
+     * @throws RuntimeException Si ocurre un error en la consulta SQL
+     */
     public Integer calcularCostoTotalMaterialesPorReparacion(Long reparacionId) {
         String sql = "SELECT COALESCE(SUM(cantidad * costo_unitario), 0) FROM materialutilizado " +
                 "WHERE tipo_documento = 'reparacion' AND documento_id = ?";
@@ -62,7 +109,18 @@ public class MaterialUtilizadoRepository {
         return 0;
     }
 
-    // Verificar si hay materiales utilizados para una reparación
+    /**
+     * Verifica si existen materiales utilizados para un documento específico.
+     * <p>
+     * Útil para determinar si un documento tiene materiales asociados
+     * antes de permitir ciertas operaciones.
+     * </p>
+     *
+     * @param tipoDocumento Tipo de documento a verificar
+     * @param documentoId ID del documento a verificar
+     * @return true si existen materiales asociados, false en caso contrario
+     * @throws RuntimeException Si ocurre un error en la consulta SQL
+     */
     public boolean existsByTipoDocumentoAndDocumentoId(MaterialUtilizado.TipoDocumento tipoDocumento, Long documentoId) {
         String sql = "SELECT COUNT(*) FROM materialutilizado WHERE tipo_documento = ? AND documento_id = ?";
 
@@ -82,7 +140,18 @@ public class MaterialUtilizadoRepository {
         return false;
     }
 
-    // Guardar material utilizado
+    /**
+     * Guarda un nuevo registro de material utilizado.
+     * <p>
+     * Inserta el registro en la base de datos y establece el ID generado
+     * en el objeto material.
+     * </p>
+     *
+     * @param material Objeto {@link MaterialUtilizado} a guardar
+     * @return El mismo objeto con el ID generado establecido
+     * @throws RuntimeException Si ocurre un error en la inserción SQL
+     * @throws IllegalArgumentException Si algún campo requerido es nulo
+     */
     public MaterialUtilizado save(MaterialUtilizado material) {
         String sql = "INSERT INTO materialutilizado (tipo_documento, documento_id, materia_id, " +
                 "cantidad, costo_unitario, fecha, usuario_id, fecha_registro) " +
@@ -117,7 +186,16 @@ public class MaterialUtilizadoRepository {
         }
     }
 
-    // Eliminar material utilizado
+    /**
+     * Elimina un registro de material utilizado por su ID.
+     * <p>
+     * Realiza una eliminación física del registro en la base de datos.
+     * Use con precaución ya que no hay recuperación de datos.
+     * </p>
+     *
+     * @param materialId ID del material utilizado a eliminar
+     * @throws RuntimeException Si ocurre un error en la eliminación SQL
+     */
     public void deleteById(Long materialId) {
         String sql = "DELETE FROM materialutilizado WHERE id = ?";
 
@@ -131,7 +209,13 @@ public class MaterialUtilizadoRepository {
         }
     }
 
-    // Verificar si existe material por ID
+    /**
+     * Verifica si existe un material utilizado por su ID.
+     *
+     * @param materialId ID del material a verificar
+     * @return true si existe, false en caso contrario
+     * @throws RuntimeException Si ocurre un error en la consulta SQL
+     */
     public boolean existsById(Long materialId) {
         String sql = "SELECT COUNT(*) FROM materialutilizado WHERE id = ?";
 
@@ -150,7 +234,17 @@ public class MaterialUtilizadoRepository {
         return false;
     }
 
-    // Mapear ResultSet a MaterialUtilizado
+    /**
+     * Mapea un ResultSet a un objeto MaterialUtilizado.
+     * <p>
+     * Método privado auxiliar para convertir filas de base de datos
+     * a objetos del dominio.
+     * </p>
+     *
+     * @param rs ResultSet con los datos del material
+     * @return Objeto {@link MaterialUtilizado} mapeado
+     * @throws SQLException Si ocurre un error al acceder a los datos del ResultSet
+     */
     private MaterialUtilizado mapToMaterialUtilizado(ResultSet rs) throws SQLException {
         MaterialUtilizado material = new MaterialUtilizado();
         material.setId(rs.getLong("id"));

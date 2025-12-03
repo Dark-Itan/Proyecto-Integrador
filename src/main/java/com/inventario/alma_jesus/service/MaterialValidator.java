@@ -4,6 +4,15 @@ import java.util.regex.Pattern;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Servicio para validar y procesar materiales en el sistema de inventario.
+ * Proporciona funcionalidades para analizar cadenas de texto que contienen materiales
+ * y sus cantidades, validando formatos y tipos de materiales.
+ *
+ * @author Alma & Jesús
+ * @version 1.0
+ * @since 2024
+ */
 public class MaterialValidator {
 
     private static final String[] MATERIALES_ENTEROS = {
@@ -16,6 +25,14 @@ public class MaterialValidator {
             "litro", "kg", "kilo", "gramo", "metro", "cm", "mm", "ml", "centimetro"
     };
 
+    /**
+     * Analiza una cadena de texto que contiene un material y su cantidad.
+     * Extrae el nombre del material y la cantidad, validando el formato.
+     *
+     * @param input Cadena de texto con el material y cantidad (ej: "2.5 litros de pintura").
+     * @return Mapa con los datos procesados: nombreMaterial, cantidad, tipo y esEntero.
+     * @throws IllegalArgumentException Si el formato es inválido o hay inconsistencias.
+     */
     public static Map<String, Object> parseMaterialWithQuantity(String input) {
         Map<String, Object> result = new HashMap<>();
         if (input == null || input.trim().isEmpty()) return result;
@@ -65,6 +82,12 @@ public class MaterialValidator {
         return result;
     }
 
+    /**
+     * Determina si un material debe tener cantidades enteras (no fraccionables).
+     *
+     * @param texto Texto que contiene el nombre del material.
+     * @return true si el material requiere cantidad entera, false si acepta fracciones.
+     */
     private static boolean esMaterialEntero(String texto) {
         for (String material : MATERIALES_ENTEROS) {
             if (texto.contains(material)) {
@@ -75,6 +98,12 @@ public class MaterialValidator {
         return false;
     }
 
+    /**
+     * Extrae el nombre del material de una cadena de texto, eliminando números y unidades.
+     *
+     * @param texto Texto completo que contiene material y cantidad.
+     * @return Nombre limpio del material.
+     */
     private static String obtenerNombreMaterial(String texto) {
         String nombre = texto.replaceAll("\\b\\d+/\\d+\\b", "")
                 .replaceAll("\\b\\d+\\.?\\d*\\b", "")
@@ -84,6 +113,12 @@ public class MaterialValidator {
         return nombre.isEmpty() ? "material varios" : nombre;
     }
 
+    /**
+     * Procesa una lista de materiales separados por comas para inventario.
+     *
+     * @param textoMateriales Cadena con múltiples materiales separados por comas.
+     * @throws IllegalArgumentException Si algún material tiene formato inválido.
+     */
     public static void procesarMaterialesParaInventario(String textoMateriales) {
         if (textoMateriales == null || textoMateriales.trim().isEmpty()) return;
 
@@ -109,6 +144,12 @@ public class MaterialValidator {
         System.out.println("✅ [MATERIAL-VALIDATOR] Procesamiento completado\n");
     }
 
+    /**
+     * Valida una lista de materiales usados en reparaciones o producciones.
+     *
+     * @param materialesUsados Cadena con materiales usados separados por comas.
+     * @throws IllegalArgumentException Si algún material no es válido.
+     */
     public static void validarMaterialesUsados(String materialesUsados) {
         if (materialesUsados == null || materialesUsados.trim().isEmpty()) return;
 

@@ -8,10 +8,38 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Controlador para gestionar las operaciones relacionadas con materias primas.
+ * <p>
+ * Esta clase maneja el CRUD de materiales, control de stock, historial de movimientos
+ * y seguimiento de inventario de materias primas utilizadas en producción.
+ * </p>
+ *
+ * @version 1.0
+ * @since 2024
+ * @see MateriaPrimaService
+ * @see MateriaPrima
+ * @see MovimientoMp
+ */
 @SuppressWarnings("unchecked")
 public class MateriaPrimaController {
+    /**
+     * Servicio que contiene la lógica de negocio para la gestión de materias primas.
+     */
     private final MateriaPrimaService materiaService = new MateriaPrimaService();
 
+    /**
+     * Endpoint 25: Lista todas las materias primas con opciones de filtrado.
+     * <p>
+     * Permite listar materiales con filtros opcionales por búsqueda textual
+     * y categoría. Retorna información detallada incluyendo stock actual.
+     * </p>
+     *
+     * @param ctx Contexto de Javalin con la petición HTTP
+     *
+     * @example
+     * Petición GET: /api/v1/materiales?categoria=Madera&buscar=roble
+     */
     // Endpoint 25: GET /api/v1/materiales - Listar materiales
     public void listarMateriales(Context ctx) {
         try {
@@ -34,6 +62,17 @@ public class MateriaPrimaController {
         }
     }
 
+    /**
+     * Endpoint 26: Obtiene una materia prima específica por ID.
+     * <p>
+     * Retorna todos los detalles de un material incluyendo su historial
+     * de movimientos reciente y datos de proveedor si están disponibles.
+     * </p>
+     *
+     * @param ctx Contexto de Javalin con la petición HTTP
+     *
+     * @throws NumberFormatException Si el ID no es un número válido
+     */
     // Endpoint 26: GET /api/v1/materiales/{id} - Obtener material
     public void obtenerMaterial(Context ctx) {
         try {
@@ -52,6 +91,30 @@ public class MateriaPrimaController {
         }
     }
 
+    /**
+     * Endpoint 27: Crea una nueva materia prima en el inventario.
+     * <p>
+     * Registra un nuevo material con sus propiedades básicas y stock inicial.
+     * Valida que no exista un material con el mismo nombre.
+     * </p>
+     *
+     * @param ctx Contexto de Javalin con la petición HTTP
+     *
+     * @example
+     * Petición POST: /api/v1/materiales
+     * Body:
+     * <pre>
+     * {
+     *     "nombre": "Tornillos 3x20",
+     *     "descripcion": "Tornillos para madera cabeza plana",
+     *     "categoria": "Fijación",
+     *     "unidad": "pzas",
+     *     "stock": 1000,
+     *     "stockMinimo": 100,
+     *     "proveedor": "Proveedor XYZ"
+     * }
+     * </pre>
+     */
     // Endpoint 27: POST /api/v1/materiales - Crear material
     public void crearMaterial(Context ctx) {
         try {
@@ -71,6 +134,15 @@ public class MateriaPrimaController {
         }
     }
 
+    /**
+     * Endpoint 28: Edita completamente una materia prima existente.
+     * <p>
+     * Actualiza todos los campos de un material excepto el historial de movimientos.
+     * Útil para correcciones de datos o cambios de especificaciones.
+     * </p>
+     *
+     * @param ctx Contexto de Javalin con la petición HTTP
+     */
     // Endpoint 28: PUT /api/v1/materiales/{id} - Editar material completo
     public void editarMaterial(Context ctx) {
         try {
@@ -96,6 +168,26 @@ public class MateriaPrimaController {
         }
     }
 
+    /**
+     * Endpoint 29: Actualiza el stock de una materia prima con registro de movimiento.
+     * <p>
+     * Modifica la cantidad de stock y registra el movimiento en el historial
+     * con el usuario responsable y una nota explicativa.
+     * </p>
+     *
+     * @param ctx Contexto de Javalin con la petición HTTP
+     *
+     * @example
+     * Petición PUT: /api/v1/materiales/456/stock
+     * Body:
+     * <pre>
+     * {
+     *     "cantidad": 1500,
+     *     "usuarioId": "admin001",
+     *     "nota": "Compra mensual de inventario"
+     * }
+     * </pre>
+     */
     // Endpoint 29: PUT /api/v1/materiales/{id}/stock - Actualizar stock
     public void actualizarStock(Context ctx) {
         try {
@@ -130,6 +222,15 @@ public class MateriaPrimaController {
         }
     }
 
+    /**
+     * Endpoint 30: Obtiene el historial de movimientos de una materia prima.
+     * <p>
+     * Retorna la lista cronológica de todos los ajustes de stock realizados
+     * en un material, incluyendo fechas, usuarios y notas.
+     * </p>
+     *
+     * @param ctx Contexto de Javalin con la petición HTTP
+     */
     // Endpoint 30: GET /api/v1/materiales/{id}/movimientos - Ver historial
     public void obtenerHistorial(Context ctx) {
         try {
@@ -148,6 +249,15 @@ public class MateriaPrimaController {
         }
     }
 
+    /**
+     * Endpoint 31: Elimina una materia prima del inventario.
+     * <p>
+     * Elimina permanentemente un material del sistema.
+     * Solo se permite si el material tiene stock cero y no tiene movimientos recientes.
+     * </p>
+     *
+     * @param ctx Contexto de Javalin con la petición HTTP
+     */
     // Endpoint 31: DELETE /api/v1/materiales/{id} - Eliminar material
     public void eliminarMaterial(Context ctx) {
         try {
