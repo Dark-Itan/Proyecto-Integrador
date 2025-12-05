@@ -94,4 +94,5 @@ public class EstadisticaMaterial {
     public void setCantidadConsumida(BigDecimal cantidadConsumida) {
         this.cantidadConsumida = cantidadConsumida;
     }
+    // --- Cambio realizado para la actividad U4ACT003 (Java/GitHub) ---
 }
